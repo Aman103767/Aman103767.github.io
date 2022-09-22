@@ -1,338 +1,319 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio</title>
-    <link rel="stylesheet" href="styles/styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-        integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <title>Aman Sharma</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
+    <script src="https://kit.fontawesome.com/5a5234c63a.js" crossorigin="anonymous"></script>
 </head>
 
-<body class="main-content">
-    <header class="container header active" id="home">
-        <div class="header-content">
-            <div class="left-header">
-                <div class="h-shape"></div>
-                <div class="image">
-                    <img src="aman.png" alt="">
-                </div>
-            </div>
-            <div class="right-header">
-                <h1 class="name">
-                    Hi, I'm <span>Aman Sharma.</span>
-                    A Backend Developer.
-                </h1>
-           
-                <div class="btn-con">
-                    <a href="Aman-Sharma-Resume.pdf" download class="main-btn">
-                        <span class="btn-text">Download CV</span>
-                        <span class="btn-icon"><i class="fas fa-download"></i></span>
-                    </a>
-                </div>
-            </div>
-        </div>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <a href="#" class="brand">Aman Sharma</a>
+        <div class="menu-btn"></div>
+        <div class="navigation">
+            <ul>
+                
+                <li><a href="#main">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#skills">Skills</a></li>
+                <li><a href="#services">Education</a></li>
+                <li><a href="#work">Projects</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="Aman-Sharma-Resume.pdf" target="_blank" rel="noreferrer">Resume</a></li>
+
+            </ul>
     </header>
+
+    <!-- MAIN -->
+        
     <main>
-        <section class="container about" id="about">
-            <div class="main-title">
-                <h2>About <span>me</span><span class="bg-text">my stats</span></h2>
+        <section class="main" id="main">
+            <div class="content">
+                <h2>Hello, I'm<br><span>Aman Sharma</span></h2>
+                <div class="animated-text">
+                    <h3>Back-End Developer
+                    </h3>
+                    <h3>Back-End Developer</h3>
+                    
+                </div>
+                <a href="#work" class="btn" >See My Work</a>
+                <a href="Aman-Sharma-Resume.pdf" download class="btn" style="margin-left: 10px"> Resume</a>
+                <div class="media-icons">
+                    <a target="_blank" rel="noreferrer" href="https://github.com/Aman103767"><i class="fab fa-github"></i></a>
+                    <a target="_blank" rel="noreferrer" href="https://www.linkedin.com/in/%E3%83%84aman/"><i class="fab fa-linkedin"></i></a>
+                   
+                </div>
             </div>
-            <div class="about-container">
-                <div class="left-about">
-                    <h4>Information About me</h4>
-                    <p>
-                        I'm an aspiring Java Backend Developer, with a specialization in Spring, Spring-Boot, JDBC with SQL, Hibernate, HTML, CSS, JAVASCRIPT.<br>
+        </section>
+
+        <section class="about" id="about">
+            <div class="title reveal">
+                <h2 class="section-title">About Me</h2>
+            </div>
+            <div class="content">
+                <div class="column col-left reveal">
+                    <div id="prachiImg" class="img-card">
+                        <img id = "aman" src="aman.png" alt="">
+                    </div>
+                </div>
+                <div class="column col-right reveal">
+                    <h2 id="h22" class="content-title">Hey There! I'm Aman Sharma</h2>
+                    <p id="para22" class="paragraph-text">I'm an aspiring Java Backend Developer, with a specialization in Spring, Spring-Boot, JDBC with SQL, Hibernate, HTML, CSS, JAVASCRIPT.
                         Confortable with JAVA 8 and above.Since very young age I am very much interested in learning new things and make human life easiler.
                     </p>
-                  
-                  
-                    <div class="btn-con">
-                        <a href="Aman-Sharma-Resume.pdf" download class="main-btn">
-                            <span class="btn-text">Download CV</span>
-                            <span class="btn-icon"><i class="fas fa-download"></i></span>
-                        </a>
-                    </div>
+                    <p id="para22">I guarantee enthusiasm in work and fulfilling my projects with inexpressible efforts.</p>
+        
                 </div>
-                
-            <div class="about-stats">
-                <h4 class="stat-title">My Skills</h4>
-                <div class="progress-bars">
-                    <div class="progress-bar">
-                        <p class="prog-title">html</p>
-                        <div class="progress-con">
-                            <!-- <p class="prog-text">80%</p> -->
-                            <div class="progress">
-                                <span class="html"></span>
-                            </div>
-                        </div>
+            </div>
+        </section>
+
+        <section class="skills" id="skills">
+            <div class="title reveal">
+                <h2 class="section-title">My Skills</h2>
+            </div>
+            <div class="content">
+                <div class="column col-left reveal">
+                    <h2 id="h22" class="content-title">My Skills and Experiences</h2>
+                    <h3>1200+ hours of coding</h3>
+                  <br>I am always excited by new technologies, therefore, I do not hesitate to take up coding task.</p>
+                    <a href="#" class="btn">See More</a>
+                </div>
+                <div class="column col-right reveal">
+                   <div>
+                       <img class="iconImage" src="https://cdn.svgporn.com/logos/html-5.svg" alt="">
+                       <!-- <span>HTML</span> -->
+
+                       <img class="iconImage" src="https://cdn.svgporn.com/logos/css-3.svg" alt="">
+                       <!-- <span>HTML</span> -->
+
+
+                       <img class="iconImage" id="jsicon" src="https://cdn.svgporn.com/logos/javascript.svg" alt="">
+                       <!-- <span>HTML</span> -->
+
+                   
+                      
+
+                       <img class="iconImage" src="https://www.mementotech.in/assets/images/icons/express.png" alt="">
+                       <!-- <span>HTML</span> -->
+
+                       <img class="iconImage" src="https://img.icons8.com/nolan/344/java-coffee-cup-logo.png" alt="">
+  
+                       <img class="iconImage" src="images/springboot.png" alt="">
+                      
+
+                       <img class="iconImage" src="https://cdn.svgporn.com/logos/mysql.svg" alt="">
+                   
+
+             
+                   
+
+                   </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="services" id="services">
+            <div class="title reveal">
+                <h2 class="section-title">My Education</h2>
+            </div>
+            <div class="content">
+             
+                <div id="card1" class="card reveal">
+                    <h2 id="headingColor">Full-Stack Web Development</h2>
+                    <h3 id="isGap22">Masai School , Bangalore</h3>
+                    <p id="para22">OCTOBER 2021 - Present</p>
+                </div>
+                <div id="card1" class="card reveal">
+                    <h2 id="headingColor">Class 12 (Science)</h2>
+                    <h3 id="isGap22">The Sharpage School</h3>
+                    <p id="para22">MARCH 2020 - MARCH 2021</p>
+                </div>
+              
+            </div>
+        </section>
+
+        <section class="work" id="work">
+            <div class="title reveal">
+                <h2 class="section-title">My Projects</h2>
+            </div>
+            <div id="myProjects" class="content">
+                <div class="mainDiv">
+                    <div>
+                        <img class="projectImage" src="./images/asos.png" alt="" height="100%" width="100%">
                     </div>
-                    <div class="progress-bar">
-                        <p class="prog-title">css</p>
-                        <div class="progress-con">
-                            <!-- <p class="prog-text">95%</p> -->
-                            <div class="progress">
-                                <span class="css"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="progress-bar">
-                        <p class="prog-title">javascript</p>
-                        <div class="progress-con">
-                            <!-- <p class="prog-text">75%</p> -->
-                            <div class="progress">
-                                <span class="js"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="progress-bar">
-                        <p class="prog-title">JAVA</p>
-                        <div class="progress-con">
-                            <!-- <p class="prog-text">75%</p> -->
-                            <div class="progress">
-                                <span class="react"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="progress-bar">
-                        <p class="prog-title">SQL</p>
-                        <div class="progress-con">
-                            <!-- <p class="prog-text">85%</p> -->
-                            <div class="progress">
-                                <span class="react"></span>
-                            </div>
-                        </div>
-                    </div>
+                    <div id="projectDes">
+                        <h1 id="hcolor">ASOS.COM</h1>
+                        <p id="des2">ASOS is one of the leading fashion product brands and we made a clone
+                            of its online retail platform.</p>
+                        <h3 id="head2">Features:</h3>
                     
-        </section>
-        <section class="container" id="portfolio">
-            <div class="main-title">
-                <h2>My <span>Project</span><span class="bg-text">My Work</span></h2>
-            </div>
-            <p class="port-text">
-                Here is some of my work that I've done in various programming languages.
-            </p>
-            <div class="portfolios">
-                <div class="portfolio-item">
-                    <div class="image">
-                        <img src="asos.png" alt="">
-                    </div>
-                    <div class="hover-items">
-                        <h3>Project Source</h3>
-                        <div class="icons">
-                            <a href="https://github.com/Aman103767/Unit-3-project" class="icon">
-                                <i class="fab fa-github"></i>
-                            </a>
-                            <a href="https://relaxed-starship-4fb21b.netlify.app/" class="icon">
-                                <i class="fab fa-behance"></i>
-                            </a>
-                           
+                        1. Product discovery page <br>
+                        2. Easy navigation and design  <br> 
+                        3. Plenty of varieties and choices  <br> 
+
+                        <h3 id="head2">Tech Stack:</h3>
+                        HTML , CSS , JavaScript <br><br>
+
+                        <div class="btnIs">
+                            <button id="btn1" class="btns"><a target="_blank" rel="noreferrer" id="atag" href="https://unit-3-project-upoq.vercel.app/">Deploy</a></button>
+                            <button id="btn2" class="btns"><a target="_blank" rel="noreferrer" id="atag" href="https://github.com/Aman103767/Unit-3-project">Code</a></button>
                         </div>
-                    </div>
-                </div>
-                <div class="portfolio-item">
-                    <div class="image">
-                        <img src="kindmeal.png" alt="">
-                    </div>
-                    <div class="hover-items">
-                        <h3>Project Source</h3>
-                        <div class="icons">
-                            <a href="https://github.com/Aman103767/TEAM-ONE-PIECE" class="icon">
-                                <i class="fab fa-github"></i>
-                            </a>
-                            <a href="https://keen-pasca-121c61.netlify.app/" class="icon">
-                                <i class="fab fa-behance"></i>
-                            </a>
-                           
-                        </div>
-                    </div>
-                </div>
-                <div class="portfolio-item">
-                    <div class="image">
-                        <img src="weather.png" alt="">
-                    </div>
-                    <div class="hover-items">
-                        <h3>Project Source</h3>
-                        <div class="icons">
-                            <a href="https://github.com/Aman103767/weather-app-2" class="icon">
-                                <i class="fab fa-github"></i>
-                            </a>
-                            <a href="https://dainty-selkie-a4e7d7.netlify.app/" class="icon">
-                                <i class="fab fa-behance"></i>
-                            </a>
-                           
-                        </div>
-                    </div>
-                </div>
-               
-        </section>
-        <section class="container" id="blogs">
-            <div class="blogs-content">
-                <div class="main-title">
-                    <h2>My <span>Blogs</span><span class="bg-text">My Blogs</span></h2>
-                </div>
-                <div class="blogs">
-                    <div class="blog">
-                        <img src="asos.png" alt="">
-                        <div class="blog-text">
-                            <h4>
-                                Asos
-                            </h4>
-                            <p>
-                               Asos is one of the top leading fashion brands and we made a clone of its online retail platform. This was the group project team of 5 members.
-                            </p>
-                        </div>
-                    </div>
-                    <div class="blog">
-                        <img src="kindmeal.png" alt="">
-                        <div class="blog-text">
-                            <h4>
-                             kindmeal
-                            </h4>
-                            <p>
-                               kindmeal is an online food delivery website and we made a clone of its online retail platform. This was the group project team of 5 members.
-                            </p>
-                        </div>
-                    </div>
-                    <div class="blog">
-                        <img src="weather.png" alt="">
-                        <div class="blog-text">
-                            <h4>
-                                weather App
-                            </h4>
-                            <p>
-                                weather App will not only show you about the temperature of that specific region instead. App can describe the accurate time of the sunrise and sunset, etc.
-                            </p>
-                        </div>
-                    </div>
-            </div>
-        </section>
-        <section class="container contact" id="contact">
-            <div class="contact-container">
-                <div class="main-title">
-                    <h2>Contact <span>Me</span><span class="bg-text">Contact</span></h2>
-                </div>
-                <div class="contact-content-con">
-                    <div class="left-contact">
-                        <h4>Contact me here</h4>
                         
-                        <div class="contact-info">
-                            <div class="contact-item">
-                                <div class="icon">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    <span>Location</span>
-                                </div>
-                                <p>
-                                    <span>: Gwalior</span>
-                                </p>
-                            </div>
-                            <div class="contact-item">
-                                <div class="icon">
-                                    <i class="fas fa-envelope"></i>
-                                    <span>Email</span>
-                                </div>
-                                <p>
-                                    <span>: avinash103767gmail.com</span>
-                                </p>
-                            </div>
-                            <div class="contact-item">
-                                <div class="icon">
-                                    <i class="fas fa-user-graduate"></i>
-                                    <span>Education</span>
-                                </div>
-                                <p>
-                                    <div class = "divm"><span class = "m">: Backend development from Masai School</span></div>
-                                    
-                                </p>
-                            </div>
-                            <div class="contact-item">
-                                <div class="icon">
-                                    <i class="fas fa-user-graduate"></i>
-                                    <span>Mobile Number</span>
-                                </div>
-                                <p>
-                                    <span>: 8839442948</span>
-                                </p>
-                            </div>
-                            <div class="contact-item">
-                                <div class="icon">
-                                    <i class="fas fa-globe-africa"></i>
-                                    <span>Languages</span>
-                                </div>
-                                <p>
-                                    <span>: Hindi, English</span>
-                                </p>
-                            </div>
-                        </div>
-                        <div class="contact-icons">
-                            <div class="contact-icon">
-                               
-                                
-                                <a href="https://github.com/Aman103767" target="_blank">
-                                    <i class="fab fa-github"></i>
-                                </a>
-    
-                                <a href="https://www.linkedin.com/in/%E3%83%84aman/" target="_blank">
-                                  
-                                    <svg class="link" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                                    <i class="fab fa-linked"></i>
-                                </a>
-                            </div>
+                    </div>
+                   
+                </div>
+                <div class="mainDiv">
+                    <div>
+                        <img class="projectImage" src="images/kindmeal.png" alt="" height="100%" width="100%">
+                    </div >
+                    <div id="projectDes">
+                        <h1 id="hcolorp">KindMeal.COM</h1>
+                        <p id="des2">KindMeal is an online food delivery website</p>
+                        <h3 id="head2">Features:</h3>
+                    
+                        1. Filtered food items data<br>
+                        2. Provided filters for user convenience  <br> 
+                        3. User interactive interface  <br> 
+
+                        <h3 id="head2">Tech Stack:</h3>
+                        HTML , CSS , JavaScript <br><br>
+
+                        <div class="btnIs">
+                            <button id="btn3" class="btns"><a id="atag" target="_blank" rel="noreferrer" href="https://keen-pasca-121c61.netlify.app/">Deploy</a></button>
+                            <button id="btn4" class="btns"><a  id="atag" target="_blank" rel="noreferrer" href="https://github.com/Aman103767/TEAM-ONE-PIECE">Code</a></button>
                         </div>
                     </div>
-                    <div class="right-contact">
-                        <form action="" class="contact-form">
-                            <div class="input-control i-c-2">
-                                <input type="text" required placeholder="YOUR NAME">
-                                <input type="email" required placeholder="YOUR EMAIL">
-                            </div>
-                            <div class="input-control">
-                                <input type="text" required placeholder="ENTER SUBJECT">
-                            </div>
-                            <div class="input-control">
-                                <textarea name="" id="" cols="15" rows="8" placeholder="Message Here..."></textarea>
-                            </div>
-                            <div class="submit-btn">
-                                <!-- <a href="#" class="main-btn">
-                                    <span class="btn-text">Download CV</span>
-                                    <span class="btn-icon"><i class="fas fa-download"></i></span>
-                                </a> -->
-                            </div>
-                        </form>
+                   
+                </div>
+                <div class="mainDiv">
+                    <div>
+                        <img class="projectImage" src="images/weather.png" alt="" height="100%" width="100%">
+                    </div>
+                    <div id="projectDes">
+                        <h1 id="hcolory">Weather App</h1>
+                        <p id="des2">Weather Web Application</p>
+                        <h3 id="head2">Features:</h3>
+                    
+                        1. Search in any region <br>
+                      
+                       
+
+                        <h3 id="head2">Tech Stack:</h3>
+                        HTML , CSS , JavaScript<br>
+                      <br>
+                        <div class="btnIs">
+                            <button id="btn5" class="btns"><a target="_blank" rel="noreferrer" id="atag" href="https://dainty-selkie-a4e7d7.netlify.app/">Deploy</a></button>
+                            <button id="btn6" class="btns"><a target="_blank" rel="noreferrer" id="atag" href="https://github.com/Aman103767/weather-app-2">Code</a></button>
+                        </div><br><br><br>
+                    </div>
+                   
+                </div>
+            </div>
+        </section>
+        
+
+
+
+        <script
+        src="https://unpkg.com/github-calendar@latest/dist/github-calendar.min.js"
+      ></script>
+      
+      <!-- Optionally, include the theme (if you don't want to struggle to write the CSS) -->
+      <link
+         rel="stylesheet"
+         href="https://unpkg.com/github-calendar@latest/dist/github-calendar-responsive.css"
+      />
+      
+      <!-- Prepare a container for your calendar. -->
+      <div class="calendar">
+          <!-- Loading stuff -->
+          Loading the data just for you.
+      </div>
+      
+      <script>
+          GitHubCalendar(".calendar", "aman103767");
+          // or enable responsive functionality
+          GitHubCalendar(".calendar", "aman103767", { responsive: true });
+      </script>
+
+
+
+
+
+
+
+        <section class="contact" id="contact">
+            <div class="title reveal">
+                <h2 class="section-title">Contact Me</h2>
+            </div>
+            <div class="content">
+                <div class="rowIs">
+                    <div class="card reveal" id="fontosm" >
+                        <div class="contact-icon">
+                            <a target="_blank" rel="noreferrer" id="cicin" href="https://www.linkedin.com/in/%E3%83%84aman/">
+                            <img src="data:image/png;base64,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" alt="" height="100%" width="100%">
+                        </div>
+                        <div class="info">
+                            <h3>Linkedin</h3>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card reveal" id="fontosm">
+                        <div class="contact-icon">
+                            <a target="_blank" rel="noreferrer" id="cicin" href="https://avinash103767@gmail.com">
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR3m4DtcDKzM-N0BXc1FvR0Pipmo8ltFFfeog&usqp=CAU" alt="" height="100%" width="100%">
+                        </div>
+                        <div class="info">
+                            <h3>Email Id</h3>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card reveal" id="fontosm">
+                        <div class="contact-icon">
+                            <a target="_blank" rel="noreferrer" id="cicin" href="https://github.com/Aman103767">
+                            <img src="https://icons-for-free.com/iconfiles/png/512/github+icon-1320168274457504277.png" alt="" height="100%" width="100%">
+                        </div>
+                        <div class="info">
+                            <h3>Git Hub</h3>
+                            </a>
+                        </div>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="contact-form reveal">
+                        <h3>Send Message</h3>
+                        <div class="input-box">
+                            <input type="text" name="" value="" placeholder="Name">
+                        </div>
+                        <div class="input-box">
+                            <input type="text" name="" value="" placeholder="Email">
+                        </div>
+                        <div class="input-box">
+                            <textarea name="name" rows="8" cols="80" placeholder="Message"></textarea>
+                        </div>
+                        <div class="input-box">
+                            <input type="submit" class="send-btn" name="" value="Send">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="scrollToTop-btn">
+                <i class="fas fa-angle-up"></i>
             </div>
         </section>
     </main>
 
-    <div class="controls">
-        <div class="control active-btn" data-id="home">
-            <i class="fas fa-home"></i>
-        </div>
-        <div class="control" data-id="about">
-            <i class="fas fa-user"></i>
-        </div>
-        <div class="control" data-id="portfolio">
-            <i class="fas fa-briefcase"></i>
-        </div>
-        <div class="control" data-id="blogs">
-            <i class="far fa-newspaper"></i>
-        </div>
-        <div class="control" data-id="contact">
-            <i class="fas fa-envelope-open"></i>
-        </div>
-    </div>
-    <div class="theme-btn">
-        <i class="fas fa-adjust"></i>
-    </div>
-    <script src="app.js"></script>
+
+    <!-- FOOTER -->
+
+    <script src="script.js" charset="utf-8"></script>
+
 </body>
 
 </html>
