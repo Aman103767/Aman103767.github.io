@@ -9,7 +9,7 @@
 }
 
 section {
-  padding: 100px 200px;
+  padding: 100px 120px;
 }
 
 .main {
@@ -237,7 +237,6 @@ body {
   border-radius: 10px;
   margin-left: 16%;
   border: 3px solid rgb(228, 226, 226);
-  
 }
 
 .about .content .col-right .content-title {
@@ -719,11 +718,8 @@ body {
 }
 
 #prachiImg {
- 
-
   border-radius: 12px;
 }
-
 
 .iconImage {
   height: 15%;
@@ -762,19 +758,25 @@ body {
   justify-content: space-between;
   width: 100%;
   height: 500px;
+  border: 5px solid #3a6cf463;
+  border-radius: 15px;
   margin-bottom: 4%;
+  /* border:  1px solid red; */
 }
 
-.mainDiv> div {
-  width: 48%;
-  height: 470px;
-  margin-bottom: 4%;
+.mainDiv > div {
+  width: 100%;
+  /* height: auto; */
+  /* margin-bottom: 4%; */
+  /* border: 1px solid red; */
 }
 
 #projectDes {
   color: white;
   font-size: 16px;
   margin-left: 6%;
+  height: auto;
+  margin-bottom: 20px;
 }
 
 #des2 {
@@ -785,19 +787,26 @@ body {
 #head2 {
   margin-top: 4%;
   margin-bottom: 1%;
-  font-size: 22px;
+  font-size: 18px;
 }
 
 .projectImage {
   border: 5px solid rgb(6, 0, 36);
-  height: 90%;
-  width: 120%;
-  margin-left: -15%;
+  height: 55%;
+  width: 100%;
+  z-index: 100%, 50%;
+  /* margin-top: 10%; */
+  /* display: flex;
+  justify-content: center; */
+  /* margin-top: 15%; */
+
+  /* margin-left: -15%; */
+  border-radius: 15px;
 }
 
 #hcolor {
   color: #5bd6ff;
-  font-size: 38px;
+  font-size: 30px;
   margin-bottom: 1%;
 }
 
@@ -822,12 +831,12 @@ body {
 }
 
 .btns {
-  width: 45%;
-  height: 100%;
-  font-size: 18px;
+  width: 35%;
+  height: 75%;
+  font-size: 15px;
   padding: 3px 2px;
   border: none;
-  border-radius: 5% 5% 5% 5% ;
+  border-radius: 9% 25% 9% 25%;
   font-weight: bolder;
 }
 
@@ -855,7 +864,7 @@ body {
   background-color: rgb(255, 234, 113);
 }
 
-#fontosm{
+#fontosm {
   width: 30%;
   height: 15%;
   padding: 4%;
@@ -864,7 +873,7 @@ body {
   border: 2px solid rgb(221, 220, 220);
 }
 
-.rowIs{
+.rowIs {
   display: flex;
   justify-content: space-between;
   width: 100%;
@@ -872,118 +881,117 @@ body {
   margin-bottom: 5%;
 }
 
-.contact-icon{
+.contact-icon {
   margin: auto;
   width: 35%;
   height: 70%;
 }
 
-#atag{
+#atag {
   text-decoration: none;
   color: black;
 }
 
-#cicin{
+#cicin {
   text-decoration: none;
   color: #000;
 }
 
-@media (max-width: 600px){
-
-  .stats1{
+@media (max-width: 600px) {
+  .stats1 {
     width: 85%;
 
-    margin:auto;
+    margin: auto;
   }
-  
-  .stats2{
+
+  .stats2 {
     width: 85%;
 
-    margin:auto;
-  
+    margin: auto;
   }
-  
-  #card1{
+
+  #card1 {
     height: 100%;
     width: 100%;
     text-align: center;
   }
 
-  .content{
+  .content {
     display: block;
   }
 
-  .mainDiv{
+  .mainDiv {
     display: block;
-    height: 800px;
+    height: auto;
+    /* width: 100%; */
+    /* margin: auto; */
+    border: 5px solid #3a6cf463;
+    border-radius: 15px;
+    margin-bottom: 50px;
   }
- 
-  .projectImage{
-    margin: auto;
-    width: 210%;
-    height: 60%;
-    margin-bottom: -225%;
+
+  /* .projectImage{
+    width: 80%;
+    height: auto;
+    margin-left: 12.5%;
+    
   }
 
   #projectDes{
-    width: 100%;
-    height: 100%;
-    margin-top: 0%;
+    width: 90%;
+    height:auto;
+    border: 1px solid red;
+    margin-top: -50%;
+  } */
+  #projectDes {
+    width: 90%;
   }
 
-  .btns{
-    height: 60px;
+  .btns {
+    height: 40px;
+    width: 100px;
+    /* justify-content:space-between; */
   }
 
-  .rowIs{
+  .btnIs {
+    gap: 20px;
+  }
+
+  .rowIs {
     display: block;
     margin-top: 2%;
   }
 
-  #fontosm{
+  #fontosm {
     margin: auto;
     width: 80%;
     margin-top: 4%;
     height: 100%;
   }
-
- 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
-*{
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap");
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Poppins" , sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
-.container1{
+.container1 {
   width: 85%;
   background: #fff;
   border-radius: 6px;
   padding: 20px 60px 30px 40px;
-  box-shadow:  #3a6cf4;
+  box-shadow: #3a6cf4;
   margin: auto;
 }
-.container1 .content1{
+.container1 .content1 {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
-.container1 .content1 .left-side{
+.container1 .content1 .left-side {
   width: 25%;
   height: 100%;
   display: flex;
@@ -993,8 +1001,8 @@ body {
   margin-top: 15px;
   position: relative;
 }
-.content1 .left-side::before{
-  content: '';
+.content1 .left-side::before {
+  content: "";
   position: absolute;
   height: 70%;
   width: 2px;
@@ -1003,116 +1011,128 @@ body {
   transform: translateY(-50%);
   background: #afafb6;
 }
-.content1 .left-side .details{
+.content1 .left-side .details {
   margin: 14px;
   text-align: center;
 }
-.content1 .left-side .details i{
+.content1 .left-side .details i {
   font-size: 30px;
-  color:  #3a6cf4;
+  color: #3a6cf4;
   margin-bottom: 10px;
 }
-.content1 .left-side .details .topic{
+.content1 .left-side .details .topic {
   font-size: 18px;
   font-weight: 500;
 }
 .content1 .left-side .details .text-one,
-.content1 .left-side .details .text-two{
+.content1 .left-side .details .text-two {
   font-size: 14px;
   color: #afafb6;
 }
-.container1 .content1 .right-side{
+.container1 .content1 .right-side {
   width: 75%;
   margin-left: 75px;
 }
-.content1 .right-side .topic-text{
+.content1 .right-side .topic-text {
   font-size: 23px;
   font-weight: 600;
   color: #3a6cf4;
 }
-.right-side .input-box{
+.right-side .input-box {
   height: 50px;
   width: 100%;
   margin: 12px 0;
 }
 .right-side .input-box input,
-.right-side .input-box textarea{
+.right-side .input-box textarea {
   height: 100%;
   width: 100%;
   border: none;
   outline: none;
   font-size: 16px;
-  background: #F0F1F8;
+  background: #f0f1f8;
   border-radius: 6px;
   padding: 0 15px;
   resize: none;
 }
-.right-side .message-box{
+.right-side .message-box {
   min-height: 110px;
 }
-.right-side .input-box textarea{
+.right-side .input-box textarea {
   padding-top: 6px;
 }
-.right-side .button{
+.right-side .button {
   display: inline-block;
   margin-top: 12px;
 }
-.right-side .button input[type="button"]{
+.right-side .button input[type="button"] {
   color: #fff;
   font-size: 18px;
   outline: none;
   border: none;
   padding: 8px 16px;
   border-radius: 6px;
-  background:#3a6cf4;
+  background: #3a6cf4;
   cursor: pointer;
   transition: all 0.3s ease;
 }
-.button input[type="button"]:hover{
+.button input[type="button"]:hover {
   background: #5029bc;
 }
 
 @media (max-width: 950px) {
-  .container1{
+  .container1 {
     width: 90%;
-    padding: 30px 40px 40px 35px ;
+    padding: 30px 40px 40px 35px;
   }
-  .container1 .content1 .right-side{
-   width: 75%;
-   margin-left: 55px;
-}
+  .container1 .content1 .right-side {
+    width: 75%;
+    margin-left: 55px;
+  }
 }
 @media (max-width: 820px) {
-  .container1{
+  .container1 {
     margin: 40px 0;
     height: 100%;
   }
-  .container1 .content1{
+  .container1 .content1 {
     flex-direction: column-reverse;
   }
- .container1 .content1 .left-side{
-   width: 100%;
-   flex-direction: row;
-   margin-top: 40px;
-   justify-content: center;
-   flex-wrap: wrap;
- }
- .container1 .content1 .left-side::before{
-   display: none;
- }
- .container1 .content1 .right-side{
-   width: 100%;
-   margin-left: 0;
- }
+  .container1 .content1 .left-side {
+    width: 100%;
+    flex-direction: row;
+    margin-top: 40px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .container1 .content1 .left-side::before {
+    display: none;
+  }
+  .container1 .content1 .right-side {
+    width: 100%;
+    margin-left: 0;
+  }
 }
+@media (max-width: 315px) {
+  #hcolor {
+    font-size: 25px;
+  }
+  .sticky,
+  .brand {
+    font-size: 25px !important;
+  }
+  .section-title {
+    margin-bottom: none;
+  }
 
-
-
-
-
-
-
-
-
-
-
+  .contrib-number {
+    font-size: small !important;
+  }
+  .contrib-column {
+    padding: 10px 0 !important;
+    text-align: center;
+    border-left: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+    font-size: 11px;
+  }
+}
