@@ -834,10 +834,12 @@ body {
   width: 35%;
   height: 75%;
   font-size: 15px;
-  padding: 3px 2px;
-  border: none;
   border-radius: 9% 25% 9% 25%;
   font-weight: bolder;
+  padding: 3px 2px;
+  border: none;
+ 
+  
 }
 
 #btn1 {
@@ -1135,4 +1137,31 @@ body {
     border-top: 1px solid #ddd;
     font-size: 11px;
   }
+}
+.abtn{
+  background-color: rgb(109, 220, 253);
+  display :flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  font-size: 15px;
+  border-radius: 9% 25% 9% 25%;
+  font-weight: 700;
+  text-decoration: none;
+
+  
+}
+.bbtn{
+ 
+  display :flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  font-size: 15px;
+  border-radius: 9% 25% 9% 25%;
+  font-weight: 700;
+  text-decoration: none;
+  background-color: rgb(88, 133, 255);
+
+  
 }
