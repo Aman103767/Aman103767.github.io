@@ -637,7 +637,7 @@ body {
   }
 
   .section-title {
-    font-size: 1.8em;
+    font-size: 1.4em;
   }
 
   .about .content {
@@ -1164,4 +1164,48 @@ body {
   background-color: rgb(88, 133, 255);
 
   
+}
+#profex{
+  width: 200px;
+}
+.experience .content {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  flex-direction: row;
+  margin-top: 20px;
+}
+
+.experience .content .card {
+  background: #fff;
+  width: 340px;
+  margin: 10px;
+  padding: 25px;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  box-shadow: 0 5px 25px rgba(1 1 1 / 15%);
+  border-radius: 10px;
+}
+
+.experience .content .card .service-icon {
+  color: #3a6cf4;
+  font-size: 8em;
+  text-align: center;
+  transition: transform 0.5s ease;
+}
+
+.experience .content .card:hover .service-icon {
+  transform: translateY(-10px);
+}
+
+.experience .content .card .info {
+  text-align: center;
+}
+
+.experience .content .card .info h3 {
+  color: #3a6cf4;
+  font-size: 1.2em;
+  font-weight: 700;
+  margin: 10px;
 }
