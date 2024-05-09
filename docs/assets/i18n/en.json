@@ -1,0 +1,134 @@
+{
+
+    "Header.Item1" : "About me",
+    "Header.Item2" : "Experience",
+    "Header.Item3" : "Projects",
+    "Header.Item4" : "Contact",
+    "Header.cvBtn" : "Resume",
+    "Header.cvName": "Aman_Sharma_Resume.pdf",
+
+    "Banner.Pretitle": "Hello! My name is",
+    "Banner.Description": "I have <span class='underline'>2 years of experience</span> developing systems, interfaces, bots, and technological solutions to make the web a better place. I am dedicated to writing and refactoring clean, reusable, and scalable code in <span class='underline'>Java</span> and <span class='underline'>Angular</span> applying good practices and development standards.",
+    "Banner.ActionBtn": "Get in touch",
+
+    "AboutMe.Title": "About me",
+    "AboutMe.Paragraphs": [
+        "In my <span class='underline'>2 years as a developer</span>, I seek to train every day. I have worked writing <span class='underline'>unit tests</span>, <span class='underline'>performing continuous integration</span>, and covering backend developer roles with <span class='underline'>Java and Mysql</span>. I have led teams having empathy, exercising motivation to partners, and setting plans and goals together.",
+        "My skills also include implementing system improvements, optimizing sites, standardizing patterns, and suggesting and executing ideas that add value to the project I'm working on.",
+        "Some of the technologies that I have trained and worked on include (but are not limited to):"
+    ],
+
+
+    "Experience.Title": "Experience",
+    "Experience.Jobs": [{
+            "Tab": "HostBooks",
+            "Title": "Software Developer",
+            "Date": "February 2023 - Present",
+            "Description": [
+              "Developed and deployed resilient and secure backend architecture using Spring Boot and Hibernate technologies",
+              "Implemented strategic solutions to streamline data processing, enhancing the reliability of accounting applications",
+              "Crafted and orchestrated RESTful APIs for optimized inter-system communication",
+              "Fostered fluid data exchange between backend and frontend environments"
+            ]
+        }
+    ],
+
+    "FeatureProjects.Title": "My projects",
+    "FeatureProjects.Label": "Featured Project",
+    "FeatureProjects.Projects": [{
+            "Title": "BindGo",
+            "Description": "E-commerce application made from scratch with auth module, configurable different Modules, <span class='underline'>product, </span> <span class='underline'>Cart, </span> <span class='underline'>Order</span> and <span class='underline'>Review</span>. It also has feedback form logic for all products.",
+            "imgs": [
+                "assets/images/bindgo/bindgo1.png",
+                "assets/images/bindgo/bindgo2.png",
+                "assets/images/bindgo/schema.png"
+
+            ],
+            "ghLink": "https://github.com/Aman103767/E-Commerce-Application",
+            "Technologies": [ "Java","Spring Boot", "Hibernate","Mysql", "Maven", "Angular", "TypeScript", "Angular Material", "RxJS","PrimeNg", "AWS"]
+        },
+        {
+            "Title": "Online Cab Booking Application",
+            "Description": "We have create a REST API for online cab booking application which can be used by customers to login into their profile, update their information and book cabs, by a driver to login and update their details along with their cab details and accept a ride from the customer. All this is over looked by the admin who can also login and update their information as well as access the data in the application.",
+            "imgs": [
+                "assets/images/bindgo/taxi-booking-apps.jpg",
+                "assets/images/bindgo/schema2.jpg"
+            ],
+            "ghLink": "https://github.com/Aman103767/Online-Cab-Booking-Application",
+            "Technologies": ["Java","Spring Boot", "Hibernate","Mysql"]
+        },
+        {
+            "Title": "Bus-Ticket-Reservation-System",
+            "Description": "A bus ticket reservation system is an java application designed to provide customers with a personalized easy-to-utilize user experience for booking and purchasing tickets online. It stores customers' personal data records, scheduled routes, frequent trips, drop points, and other information.",
+            "imgs": [
+                "assets/images/bindgo/bus.png"
+            ],
+            "ghLink": "https://github.com/Aman103767/Bus-Ticket-Reservation-System",
+            "Technologies": ["Java", "Mysql", "JDBC"]
+        },
+        {
+            "Title": "Asos",
+            "Description": "ASOS is an E-commerce website in this website we can purchase various products like Dresses , Women Clothes, Men Clothes and more. A collaborative project, built in 5 days by a team of 6 developers.",
+            "imgs": [
+                "assets/images/asos/asos1.png",
+                "assets/images/asos/asos2.png",
+                "assets/images/asos/asos3.png",
+                "assets/images/asos/asos4.png",
+                "assets/images/asos/asos5.png",
+                "assets/images/asos/asos6.png"
+            ],
+            "ghLink": "https://github.com/Aman103767/Asos-Clone",
+            "demoLink": "https://project-unit3-f72f.vercel.app/index.html",
+            "Technologies": ["HTML", "CSS", "JavaScipt"]
+        },
+        {
+            "Title": "KindMeal",
+            "Description": "Kindmeal is a food delivery website here you can order food from favourite restaurants near you. We a group of 5 people have cloned Kindmeal website in unit 2 Contruct week of Masai School.",
+            "imgs": [
+                "assets/images/meal/meal1.png",
+                "assets/images/meal/meal2.png",
+                "assets/images/meal/meal3.png",
+                "assets/images/meal/meal4.png",
+                "assets/images/meal/meal5.png"
+            ],
+            "ghLink": "https://github.com/Aman103767/KindMeal-Clone",
+            "demoLink": "https://keen-pasca-121c61.netlify.app/",
+            "Technologies": ["HTML", "CSS", "JavaScipt"]
+        },
+        {
+            "Title": "Weather Application",
+            "Description": "This is weather app. This is a solo project here you can find climate details of any region. Every Time you refresh the background picture automatic change it shows you beauty of nature.",
+            "imgs": [
+                "assets/images/weather/weather1.png",
+                "assets/images/weather/weather2.png",
+                "assets/images/weather/weather3.png"
+            ],
+            "ghLink": "https://github.com/Aman103767/Weather-Application",
+            "demoLink": "https://dainty-selkie-a4e7d7.netlify.app",
+            "Technologies": ["HTML", "CSS", "JavaScipt"]
+        }
+    ],
+
+
+
+    "OtherProjects.Title": "More projects",
+    "OtherProjects.Projects": [{
+            "Title": "Spotify",
+            "Description": "This is spotify Music Application Where you set upload songs, albums and artist and play Song- > The main objective of this application to learn AWS with spring boot",
+            "ghLink": "https://github.com/Aman103767/Spotify-Angular",
+            "Technologies": [ "Java","Spring Boot", "Hibernate","Mysql", "Maven", "Angular", "TypeScript", "Angular Material", "RxJS","PrimeNg", "AWS"]
+        },
+        {
+            "Title": "Toll-Calculator",
+            "Description": "Toll Calculator Toll Calculator for different Vehicles Features: Calculating Total Toll , Calculating Total Discount , Calculating Total Fastag Amount Collected , Calculating Total Cash Amount Collected",
+            "ghLink": "https://github.com/Aman103767/Toll-Calculator",
+            "Technologies": ["Java"]
+        }
+    ],
+    "Contact.Pretitle": "What’s Next",
+    "Contact.Title": "Get in touch!",
+    "Contact.Content": "I will be happy to receive your contact if you want to talk about new opportunities. Write me, and I will reply as soon as I see your message. Simple one-page design that features a profile letter with basic information about a person.",
+    "Contact.Btn": "Say Hello"
+
+
+}
