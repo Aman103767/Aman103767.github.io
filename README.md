@@ -42,5 +42,3 @@ I want to quote what Brittanty has added in her proyect:
 I value keeping my site open source, but as you all know, _**plagiarism is bad**_. It's always disheartening whenever I find that someone has copied my site without giving me credit. I spent a non-trivial amount of effort building and designing this iteration of my website, and I am proud of it! All I ask of you all is to not claim this effort as your own.
 
 As I have made an attribution to Brittany, i wait you do the same with both in this proyect. Thank you :)
-
-Sorry my bad English
