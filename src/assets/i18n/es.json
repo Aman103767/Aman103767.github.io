@@ -1,0 +1,172 @@
+{
+  "Header.Item1": "मेरे बारे में",
+  "Header.Item2": "अनुभव",
+  "Header.Item3": "परियोजनाओं",
+  "Header.Item4": "संपर्क",
+  "Header.cvBtn": "रिज़्यूमे",
+  "Header.cvName": "CV_Jose_Hernandez_Hindi.pdf",
+  "Banner.Pretitle": "नमस्ते! मेरा नाम है",
+  "Banner.Description": "मैंने <span class='underline'>2 साल का अनुभव</span> प्राप्त किया है जिसमें मैंने वेब को बेहतर बनाने के लिए प्रणालियों, इंटरफेसों और तकनीकी समाधानों का विकास किया है। मैं <span class='underline'>Java, Angular</span> में साफ, पुन: उपयोगी और मापतीत कोड लिखने और पुनः बनाने के लिए समर्पित हूं, अच्छी प्रथाओं को लागू करने के और विकास मानकों के अनुपालन के साथ।",
+  "Banner.ActionBtn": "संपर्क में आओ",
+  "AboutMe.Title": "मेरे बारे में",
+  "AboutMe.Paragraphs": [
+    "मेरे <span class='underline'>2 साल</span> के डेवलपर के रूप में, मैं हर दिन प्रशिक्षण करने का प्रयास करता हूं। मैंने <span class='underline'>unit tests</span>, <span class='underline'>निरंतर एकीकरण</span> करते हुए काम किया है, और <span class='underline'>Java and Mysql</span> के साथ बैकएंड डेवलपर भूमिका का पालन किया है। मैंने टीमों को नेतृत्व किया है जिसमें सहानुभूति होती है, साथियों को प्रेरित करने का प्रयास किया है, और साथ ही योजनाओं और लक्ष्यों को साथ में तय किया है।",
+    "मेरे कौशल में सिस्टम में सुधार लाना, साइटों को अपग्रेड करना, पैटर्न को मानकित करना, और उस परियोजना में मूल्य जोड़ने के विचार और कार्य करने के सुझाव और क्रियान्वयन के भी स्थान।",
+    "मुझे प्रशिक्षित और काम किया है कुछ प्रोजेक्ट्स का उल्लेख (लेकिन ये लिमिटेड नहीं है):"
+  ],
+  "Experience.Title": "अनुभव",
+  "Experience.Jobs": [
+    {
+      "Tab": "होस्टबुक्स",
+      "Title": "सॉफ़्टवेयर डेवलपर",
+      "Date": "फरवरी 2023 - वर्तमान",
+      "Description": [
+        "स्प्रिंग बूट और हायबर्नेट तकनीकों का उपयोग करके मजबूत और सुरक्षित बैकएंड आर्किटेक्चर का विकसित और डिप्लॉय किया",
+        "डेटा प्रोसेसिंग को संचालनीय बनाने के लिए रणनीतिक समाधानों का अमल किया, लेखा अनुप्रयोगों की विश्वसनीयता को बढ़ाया",
+        "अनुप्रणाली संचार को अनुकूलित करने के लिए RESTful API बनाए और निर्देशित किए",
+        "बैकएंड और फ्रंटएंड वातावरण के बीच तरल डेटा विनिमय को संबोधित किया"
+      ]
+    }
+  ],
+  "FeatureProjects.Title": "मेरे परियोजनाएँ",
+  "FeatureProjects.Label": "विशेष योजना",
+  "FeatureProjects.Projects": [
+    {
+      "Title": "बाइंडगो",
+      "Description": "एक ई-कॉमर्स एप्लिकेशन जो स्क्रैच से बनाया गया है जिसमें प्रमाणीकरण मॉड्यूल, विभिन्न मॉड्यूल को कॉन्फ़िगर किया जा सकता है, <span class='underline'>उत्पाद, </span> <span class='underline'>कार्ट, </span> <span class='underline'>आदेश</span> और <span class='underline'>समीक्षा</span>। यह सभी उत्पादों के लिए फ़ीडबैक फॉर्म लॉजिक भी है।",
+      "imgs": [
+        "assets/images/bindgo/bindgo1.png",
+        "assets/images/bindgo/bindgo2.png",
+        "assets/images/bindgo/schema.png"
+      ],
+      "ghLink": "https://github.com/Aman103767/E-Commerce-Application",
+      "Technologies": [
+        "Java",
+        "Spring Boot",
+        "Hibernate",
+        "Mysql",
+        "Maven",
+        "Angular",
+        "TypeScript",
+        "Angular Material",
+        "RxJS",
+        "PrimeNg",
+        "AWS"
+      ]
+    },
+    {
+      "Title": "ऑनलाइन कैब बुकिंग एप्लिकेशन",
+      "Description": "हमने ऑनलाइन कैब बुकिंग एप्लिकेशन के लिए एक REST API बनाया है जिसका उपयोग ग्राहक अपने प्रोफ़ाइल में लॉगिन करके, अपनी जानकारी अपडेट करके और कैब बुक करने के लिए, ड्राइवर अपनी जानकारी और कैब विवरण के साथ लॉगिन करके और ग्राहक से राइड स्वीकार करके उपयोग कर सकता है। यह सब व्यवस्थापक द्वारा निरीक्षित किया जाता है जो अपनी जानकारी अपडेट करके और एप्लिकेशन में डेटा तक पहुँच कर सकता है।",
+      "imgs": [
+        "assets/images/bindgo/taxi-booking-apps.jpg",
+        "assets/images/bindgo/schema2.jpg"
+      ],
+      "ghLink": "https://github.com/Aman103767/Online-Cab-Booking-Application",
+      "Technologies": [
+        "Java",
+        "Spring Boot",
+        "Hibernate",
+        "Mysql"
+      ]
+    },
+    {
+      "Title": "बस टिकट आरक्षण सिस्टम",
+      "Description": "बस टिकट आरक्षण सिस्टम एक जावा एप्लिकेशन है जो ग्राहकों को ऑनलाइन टिकट बुकिंग और खरीदने के लिए एक व्यक्तिगत और सहजता से उपयोग किए जाने वाले उपयोगकर्ता अनुभव प्रदान करने के लिए डिज़ाइन किया गया है। यह ग्राहकों के व्यक्तिगत डेटा रिकॉर्ड, निर्धारित मार्ग, नियमित यात्राएँ, ड्रॉप प्वाइंट्स, और अन्य जानकारी को संग्रहित करता है।",
+      "imgs": [
+        "assets/images/bindgo/bus.png"
+      ],
+      "ghLink": "https://github.com/Aman103767/Bus-Ticket-Reservation-System",
+      "Technologies": [
+        "Java",
+        "Mysql",
+        "JDBC"
+      ]
+    },
+    {
+      "Title": "एसोस",
+      "Description": "एसोस एक ई-कॉमर्स वेबसाइट है जिसमें हम विभिन्न उत्पाद जैसे ड्रेसेस, महिलाओं के कपड़े, पुरुषों के कपड़े, और अधिक को खरीद सकते हैं। यह एक सहयोगी परियोजना है, जिसे 6 डेवलपरों की टीम ने 5 दिनों में बनाया है।",
+      "imgs": [
+        "assets/images/asos/asos1.png",
+        "assets/images/asos/asos2.png",
+        "assets/images/asos/asos3.png",
+        "assets/images/asos/asos4.png",
+        "assets/images/asos/asos5.png",
+        "assets/images/asos/asos6.png"
+      ],
+      "ghLink": "https://github.com/Aman103767/Asos-Clone",
+      "demoLink": "https://project-unit3-f72f.vercel.app/index.html",
+      "Technologies": [
+        "HTML",
+        "CSS",
+        "JavaScipt"
+      ]
+    },
+    {
+      "Title": "काइंडमील",
+      "Description": "काइंडमील एक खाद्य डिलीवरी वेबसाइट है जहां आप अपने नजदीकी पसंदीदा रेस्तरां से खाना आर्डर कर सकते हैं। हम एक समूह के 5 लोगों ने मसाई स्कूल की इकाई 2 कंस्ट्रक्ट सप्ताह में काइंडमील वेबसाइट को क्लोन किया है।",
+      "imgs": [
+        "assets/images/meal/meal1.png",
+        "assets/images/meal/meal2.png",
+        "assets/images/meal/meal3.png",
+        "assets/images/meal/meal4.png",
+        "assets/images/meal/meal5.png"
+      ],
+      "ghLink": "https://github.com/Aman103767/KindMeal-Clone",
+      "demoLink": "https://keen-pasca-121c61.netlify.app/",
+      "Technologies": [
+        "HTML",
+        "CSS",
+        "JavaScipt"
+      ]
+    },
+    {
+      "Title": "मौसम एप्लिकेशन",
+      "Description": "यह मौसम ऐप है। यह एक एकल परियोजना है जहां आप किसी भी क्षेत्र की मौसम विवरण पा सकते हैं। हर बार जब आप पृष्ठ को ताज़ा करते हैं, पृष्ठ की पृष्ठभूमि चित्र स्वचालित रूप से बदल जाती है और यह आपको प्राकृतिक सौंदर्य दिखाता है।",
+      "imgs": [
+        "assets/images/weather/weather1.png",
+        "assets/images/weather/weather2.png",
+        "assets/images/weather/weather3.png"
+      ],
+      "ghLink": "https://github.com/Aman103767/Weather-Application",
+      "demoLink": "https://dainty-selkie-a4e7d7.netlify.app",
+      "Technologies": [
+        "HTML",
+        "CSS",
+        "JavaScipt"
+      ]
+    }
+  ],
+  "OtherProjects.Title": "अधिक परियोजनाएँ",
+  "OtherProjects.Projects": [
+    {
+      "Title": "स्पॉटीफ़ाई",
+      "Description": "यह एक स्पॉटीफ़ाई संगीत एप्लिकेशन है जहां आप गाने, एल्बम और कलाकार अपलोड कर सकते हैं और गाना बजा सकते हैं। इस एप्लिकेशन का मुख्य उद्देश्य AWS को स्प्रिंग बूट के साथ सीखना है।",
+      "ghLink": "https://github.com/Aman103767/Spotify-Angular",
+      "Technologies": [
+        "Java",
+        "Spring Boot",
+        "Hibernate",
+        "Mysql",
+        "Maven",
+        "Angular",
+        "TypeScript",
+        "Angular Material",
+        "RxJS",
+        "PrimeNg",
+        "AWS"
+      ]
+    },
+    {
+      "Title": "टोल कैलकुलेटर",
+      "Description": "टोल कैलकुलेटर विभिन्न वाहनों के लिए टोल कैलकुलेटर सुविधाएं: कुल टोल की गणना, कुल डिस्काउंट की गणना, कुल फास्टैग राशि जमा करना, कुल नकद राशि जमा करना।",
+      "ghLink": "https://github.com/Aman103767/Toll-Calculator",
+      "Technologies": [
+        "Java"
+      ]
+    }
+  ],
+  "Contact.Pretitle": "अगला क्या है",
+  "Contact.Title": "संपर्क में रहें!",
+  "Contact.Content": "अगर आप नई अवसरों के बारे में चर्चा करना चाहते हैं तो मैं आपके संपर्क का स्वागत करूंगा। मुझे लिखें, और मैं आपके संदेश को देखते ही जवाब दूंगा। एक साधारण एक-पृष्ठ डिज़ाइन जो एक व्यक्ति के बारे में मूल जानकारी सहित एक प्रोफ़ाइल पत्र को विशेषता देता है।",
+  "Contact.Btn": "नमस्ते कहें"
+}
