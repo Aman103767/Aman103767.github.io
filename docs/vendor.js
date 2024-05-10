@@ -13440,7 +13440,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ 3184);
 /* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/common */ 6362);
 /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs */ 6312);
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! tslib */ 4929);
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! tslib */ 2321);
 /* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/router */ 2816);
 /* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! rxjs/operators */ 9151);
 /* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! rxjs/operators */ 6276);
@@ -16382,8 +16382,9 @@ const documentProvider = {
 const DOCUMENT_PROVIDERS = [browserDocumentProvider, documentProvider];
 
 class AutoplayService {
-    constructor(carouselService, winRef, docRef) {
+    constructor(carouselService, winRef, docRef, ngZone) {
         this.carouselService = carouselService;
+        this.ngZone = ngZone;
         /**
          * The autoplay timeout.
          */
@@ -16423,7 +16424,7 @@ class AutoplayService {
             this._handleChangeObservable(data);
         }));
         const resized$ = this.carouselService.getResizedState().pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_3__.tap)(() => {
-            if (this.carouselService.settings.autoplay) {
+            if (this.carouselService.settings.autoplay && !this._isAutoplayStopped) {
                 this.play();
             }
             else {
@@ -16463,12 +16464,16 @@ class AutoplayService {
             this.winRef.clearTimeout(this._timeout);
         }
         this._isArtificialAutoplayTimeout = timeout ? true : false;
-        return this.winRef.setTimeout(() => {
-            if (this._paused || this.carouselService.is('busy') || this.carouselService.is('interacting') || this.docRef.hidden) {
-                return;
-            }
-            this.carouselService.next(speed || this.carouselService.settings.autoplaySpeed);
-        }, timeout || this.carouselService.settings.autoplayTimeout);
+        return this.ngZone.runOutsideAngular(() => {
+            return this.winRef.setTimeout(() => {
+                this.ngZone.run(() => {
+                    if (this._paused || this.carouselService.is('busy') || this.carouselService.is('interacting') || this.docRef.hidden) {
+                        return;
+                    }
+                    this.carouselService.next(speed || this.carouselService.settings.autoplaySpeed);
+                });
+            }, timeout || this.carouselService.settings.autoplayTimeout);
+        });
     }
     ;
     /**
@@ -16553,12 +16558,13 @@ class AutoplayService {
         }
     }
 }
-AutoplayService.ɵfac = function AutoplayService_Factory(t) { return new (t || AutoplayService)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵinject"](CarouselService), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵinject"](WINDOW), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵinject"](DOCUMENT)); };
+AutoplayService.ɵfac = function AutoplayService_Factory(t) { return new (t || AutoplayService)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵinject"](CarouselService), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵinject"](WINDOW), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵinject"](DOCUMENT), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵinject"](_angular_core__WEBPACK_IMPORTED_MODULE_0__.NgZone)); };
 AutoplayService.ɵprov = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineInjectable"]({ token: AutoplayService, factory: AutoplayService.ɵfac });
 AutoplayService.ctorParameters = () => [
     { type: CarouselService },
     { type: undefined, decorators: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Inject, args: [WINDOW,] }] },
-    { type: undefined, decorators: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Inject, args: [DOCUMENT,] }] }
+    { type: undefined, decorators: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Inject, args: [DOCUMENT,] }] },
+    { type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.NgZone }
 ];
 (function () { (typeof ngDevMode === "undefined" || ngDevMode) && _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](AutoplayService, [{
         type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Injectable
@@ -16568,7 +16574,7 @@ AutoplayService.ctorParameters = () => [
             }] }, { type: undefined, decorators: [{
                 type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Inject,
                 args: [DOCUMENT]
-            }] }]; }, null); })();
+            }] }, { type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.NgZone }]; }, null); })();
 
 class LazyLoadService {
     constructor(carouselService) {
@@ -17001,9 +17007,20 @@ class CarouselComponent {
         this.spyDataStreams();
         this.carouselWindowWidth = this.el.nativeElement.querySelector('.owl-carousel').clientWidth;
     }
-    ngAfterContentChecked() {
+    ngOnChanges() {
+        var _a;
+        if (this.prevOptions !== this.options) {
+            if (this.prevOptions && ((_a = this.slides) === null || _a === void 0 ? void 0 : _a.toArray().length)) {
+                this.carouselService.setup(this.carouselWindowWidth, this.slides.toArray(), this.options);
+                this.carouselService.initialize(this.slides.toArray());
+            }
+            else {
+                this.carouselLoaded = false;
+                this.logger.log(`There are no slides to show. So the carousel won't be re-rendered`);
+            }
+            this.prevOptions = this.options;
+        }
     }
-    // ngAfterContentChecked() END
     ngAfterContentInit() {
         if (this.slides.toArray().length) {
             this.carouselService.setup(this.carouselWindowWidth, this.slides.toArray(), this.options);
@@ -17230,7 +17247,7 @@ CarouselComponent.ɵcmp = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_0
             AnimateService,
             AutoHeightService,
             HashService
-        ])], decls: 4, vars: 9, consts: [[1, "owl-carousel", "owl-theme", 3, "ngClass", "mouseover", "mouseleave", "touchstart", "touchend"], ["owlCarousel", ""], ["class", "owl-stage-outer", 4, "ngIf"], [4, "ngIf"], [1, "owl-stage-outer"], [3, "owlDraggable", "stageData", "slidesData"], [1, "owl-nav", 3, "ngClass"], [1, "owl-prev", 3, "ngClass", "innerHTML", "click"], [1, "owl-next", 3, "ngClass", "innerHTML", "click"], [1, "owl-dots", 3, "ngClass"], ["class", "owl-dot", 3, "ngClass", "click", 4, "ngFor", "ngForOf"], [1, "owl-dot", 3, "ngClass", "click"], [3, "innerHTML"]], template: function CarouselComponent_Template(rf, ctx) { if (rf & 1) {
+        ]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵNgOnChangesFeature"]], decls: 4, vars: 9, consts: [[1, "owl-carousel", "owl-theme", 3, "ngClass", "mouseover", "mouseleave", "touchstart", "touchend"], ["owlCarousel", ""], ["class", "owl-stage-outer", 4, "ngIf"], [4, "ngIf"], [1, "owl-stage-outer"], [3, "owlDraggable", "stageData", "slidesData"], [1, "owl-nav", 3, "ngClass"], [1, "owl-prev", 3, "ngClass", "innerHTML", "click"], [1, "owl-next", 3, "ngClass", "innerHTML", "click"], [1, "owl-dots", 3, "ngClass"], ["class", "owl-dot", 3, "ngClass", "click", 4, "ngFor", "ngForOf"], [1, "owl-dot", 3, "ngClass", "click"], [3, "innerHTML"]], template: function CarouselComponent_Template(rf, ctx) { if (rf & 1) {
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 0, 1);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("mouseover", function CarouselComponent_Template_div_mouseover_0_listener() { return ctx.startPausing(); })("mouseleave", function CarouselComponent_Template_div_mouseleave_0_listener() { return ctx.startPlayML(); })("touchstart", function CarouselComponent_Template_div_touchstart_0_listener() { return ctx.startPausing(); })("touchend", function CarouselComponent_Template_div_touchend_0_listener() { return ctx.startPlayTE(); });
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](2, CarouselComponent_div_2_Template, 2, 6, "div", 2);
@@ -17242,7 +17259,7 @@ CarouselComponent.ɵcmp = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_0
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.carouselLoaded);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.slides.toArray().length);
-    } }, directives: function () { return [_angular_common__WEBPACK_IMPORTED_MODULE_6__.NgClass, _angular_common__WEBPACK_IMPORTED_MODULE_6__.NgIf, StageComponent, _angular_common__WEBPACK_IMPORTED_MODULE_6__.NgForOf]; }, styles: [".owl-theme[_ngcontent-%COMP%] { display: block; }"] });
+    } }, directives: function () { return [_angular_common__WEBPACK_IMPORTED_MODULE_6__.NgClass, _angular_common__WEBPACK_IMPORTED_MODULE_6__.NgIf, StageComponent, _angular_common__WEBPACK_IMPORTED_MODULE_6__.NgForOf]; }, styles: [".owl-theme[_ngcontent-%COMP%] { display: block; }"], changeDetection: 0 });
 CarouselComponent.ctorParameters = () => [
     { type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.ElementRef },
     { type: ResizeService },
@@ -17310,6 +17327,7 @@ CarouselComponent.propDecorators = {
                     AutoHeightService,
                     HashService
                 ],
+                changeDetection: _angular_core__WEBPACK_IMPORTED_MODULE_0__.ChangeDetectionStrategy.OnPush,
                 styles: [`.owl-theme { display: block; }`]
             }]
     }], function () { return [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.ElementRef }, { type: ResizeService }, { type: CarouselService }, { type: NavigationService }, { type: AutoplayService }, { type: LazyLoadService }, { type: AnimateService }, { type: AutoHeightService }, { type: HashService }, { type: OwlLogger }, { type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.ChangeDetectorRef }, { type: undefined, decorators: [{
@@ -18097,8 +18115,8 @@ class InnerSubscriber extends _Subscriber__WEBPACK_IMPORTED_MODULE_0__.Subscribe
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "NotificationKind": () => (/* binding */ NotificationKind),
-/* harmony export */   "Notification": () => (/* binding */ Notification)
+/* harmony export */   "Notification": () => (/* binding */ Notification),
+/* harmony export */   "NotificationKind": () => (/* binding */ NotificationKind)
 /* harmony export */ });
 /* harmony import */ var _observable_empty__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./observable/empty */ 6439);
 /* harmony import */ var _observable_of__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./observable/of */ 4139);
@@ -18523,9 +18541,9 @@ Scheduler.now = () => Date.now();
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "SubjectSubscriber": () => (/* binding */ SubjectSubscriber),
+/* harmony export */   "AnonymousSubject": () => (/* binding */ AnonymousSubject),
 /* harmony export */   "Subject": () => (/* binding */ Subject),
-/* harmony export */   "AnonymousSubject": () => (/* binding */ AnonymousSubject)
+/* harmony export */   "SubjectSubscriber": () => (/* binding */ SubjectSubscriber)
 /* harmony export */ });
 /* harmony import */ var _Observable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Observable */ 2378);
 /* harmony import */ var _Subscriber__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Subscriber */ 14);
@@ -18730,8 +18748,8 @@ class SubjectSubscription extends _Subscription__WEBPACK_IMPORTED_MODULE_0__.Sub
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Subscriber": () => (/* binding */ Subscriber),
-/* harmony export */   "SafeSubscriber": () => (/* binding */ SafeSubscriber)
+/* harmony export */   "SafeSubscriber": () => (/* binding */ SafeSubscriber),
+/* harmony export */   "Subscriber": () => (/* binding */ Subscriber)
 /* harmony export */ });
 /* harmony import */ var _util_isFunction__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./util/isFunction */ 1900);
 /* harmony import */ var _Observer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Observer */ 9957);
@@ -19305,9 +19323,9 @@ class RefCountSubscriber extends _Subscriber__WEBPACK_IMPORTED_MODULE_4__.Subscr
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "combineLatest": () => (/* binding */ combineLatest),
 /* harmony export */   "CombineLatestOperator": () => (/* binding */ CombineLatestOperator),
-/* harmony export */   "CombineLatestSubscriber": () => (/* binding */ CombineLatestSubscriber)
+/* harmony export */   "CombineLatestSubscriber": () => (/* binding */ CombineLatestSubscriber),
+/* harmony export */   "combineLatest": () => (/* binding */ combineLatest)
 /* harmony export */ });
 /* harmony import */ var _util_isScheduler__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/isScheduler */ 7507);
 /* harmony import */ var _util_isArray__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/isArray */ 4327);
@@ -19814,9 +19832,9 @@ function of(...args) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "race": () => (/* binding */ race),
 /* harmony export */   "RaceOperator": () => (/* binding */ RaceOperator),
-/* harmony export */   "RaceSubscriber": () => (/* binding */ RaceSubscriber)
+/* harmony export */   "RaceSubscriber": () => (/* binding */ RaceSubscriber),
+/* harmony export */   "race": () => (/* binding */ race)
 /* harmony export */ });
 /* harmony import */ var _util_isArray__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/isArray */ 4327);
 /* harmony import */ var _fromArray__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./fromArray */ 8005);
@@ -19981,9 +19999,9 @@ function dispatch(state) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "zip": () => (/* binding */ zip),
 /* harmony export */   "ZipOperator": () => (/* binding */ ZipOperator),
-/* harmony export */   "ZipSubscriber": () => (/* binding */ ZipSubscriber)
+/* harmony export */   "ZipSubscriber": () => (/* binding */ ZipSubscriber),
+/* harmony export */   "zip": () => (/* binding */ zip)
 /* harmony export */ });
 /* harmony import */ var _fromArray__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./fromArray */ 8005);
 /* harmony import */ var _util_isArray__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../util/isArray */ 4327);
@@ -20690,8 +20708,8 @@ function last(predicate, defaultValue) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "map": () => (/* binding */ map),
-/* harmony export */   "MapOperator": () => (/* binding */ MapOperator)
+/* harmony export */   "MapOperator": () => (/* binding */ MapOperator),
+/* harmony export */   "map": () => (/* binding */ map)
 /* harmony export */ });
 /* harmony import */ var _Subscriber__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../Subscriber */ 14);
 
@@ -20766,9 +20784,9 @@ function mergeAll(concurrent = Number.POSITIVE_INFINITY) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "mergeMap": () => (/* binding */ mergeMap),
 /* harmony export */   "MergeMapOperator": () => (/* binding */ MergeMapOperator),
-/* harmony export */   "MergeMapSubscriber": () => (/* binding */ MergeMapSubscriber)
+/* harmony export */   "MergeMapSubscriber": () => (/* binding */ MergeMapSubscriber),
+/* harmony export */   "mergeMap": () => (/* binding */ mergeMap)
 /* harmony export */ });
 /* harmony import */ var _util_subscribeToResult__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../util/subscribeToResult */ 640);
 /* harmony import */ var _OuterSubscriber__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../OuterSubscriber */ 5266);
@@ -20873,8 +20891,8 @@ class MergeMapSubscriber extends _OuterSubscriber__WEBPACK_IMPORTED_MODULE_2__.O
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "multicast": () => (/* binding */ multicast),
-/* harmony export */   "MulticastOperator": () => (/* binding */ MulticastOperator)
+/* harmony export */   "MulticastOperator": () => (/* binding */ MulticastOperator),
+/* harmony export */   "multicast": () => (/* binding */ multicast)
 /* harmony export */ });
 /* harmony import */ var _observable_ConnectableObservable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../observable/ConnectableObservable */ 4483);
 
@@ -20924,10 +20942,10 @@ class MulticastOperator {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "observeOn": () => (/* binding */ observeOn),
+/* harmony export */   "ObserveOnMessage": () => (/* binding */ ObserveOnMessage),
 /* harmony export */   "ObserveOnOperator": () => (/* binding */ ObserveOnOperator),
 /* harmony export */   "ObserveOnSubscriber": () => (/* binding */ ObserveOnSubscriber),
-/* harmony export */   "ObserveOnMessage": () => (/* binding */ ObserveOnMessage)
+/* harmony export */   "observeOn": () => (/* binding */ observeOn)
 /* harmony export */ });
 /* harmony import */ var _Subscriber__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../Subscriber */ 14);
 /* harmony import */ var _Notification__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Notification */ 7928);
@@ -22390,9 +22408,9 @@ const queue = new _QueueScheduler__WEBPACK_IMPORTED_MODULE_0__.QueueScheduler(_Q
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "$$iterator": () => (/* binding */ $$iterator),
 /* harmony export */   "getSymbolIterator": () => (/* binding */ getSymbolIterator),
-/* harmony export */   "iterator": () => (/* binding */ iterator),
-/* harmony export */   "$$iterator": () => (/* binding */ $$iterator)
+/* harmony export */   "iterator": () => (/* binding */ iterator)
 /* harmony export */ });
 function getSymbolIterator() {
     if (typeof Symbol !== 'function' || !Symbol.iterator) {
@@ -22431,8 +22449,8 @@ const observable = (() => typeof Symbol === 'function' && Symbol.observable || '
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "rxSubscriber": () => (/* binding */ rxSubscriber),
-/* harmony export */   "$$rxSubscriber": () => (/* binding */ $$rxSubscriber)
+/* harmony export */   "$$rxSubscriber": () => (/* binding */ $$rxSubscriber),
+/* harmony export */   "rxSubscriber": () => (/* binding */ rxSubscriber)
 /* harmony export */ });
 const rxSubscriber = (() => typeof Symbol === 'function'
     ? Symbol('rxSubscriber')
@@ -23098,283 +23116,6 @@ function toSubscriber(nextOrObserver, error, complete) {
 
 /***/ }),
 
-/***/ 4929:
-/*!*****************************************!*\
-  !*** ./node_modules/tslib/tslib.es6.js ***!
-  \*****************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "__extends": () => (/* binding */ __extends),
-/* harmony export */   "__assign": () => (/* binding */ __assign),
-/* harmony export */   "__rest": () => (/* binding */ __rest),
-/* harmony export */   "__decorate": () => (/* binding */ __decorate),
-/* harmony export */   "__param": () => (/* binding */ __param),
-/* harmony export */   "__metadata": () => (/* binding */ __metadata),
-/* harmony export */   "__awaiter": () => (/* binding */ __awaiter),
-/* harmony export */   "__generator": () => (/* binding */ __generator),
-/* harmony export */   "__createBinding": () => (/* binding */ __createBinding),
-/* harmony export */   "__exportStar": () => (/* binding */ __exportStar),
-/* harmony export */   "__values": () => (/* binding */ __values),
-/* harmony export */   "__read": () => (/* binding */ __read),
-/* harmony export */   "__spread": () => (/* binding */ __spread),
-/* harmony export */   "__spreadArrays": () => (/* binding */ __spreadArrays),
-/* harmony export */   "__spreadArray": () => (/* binding */ __spreadArray),
-/* harmony export */   "__await": () => (/* binding */ __await),
-/* harmony export */   "__asyncGenerator": () => (/* binding */ __asyncGenerator),
-/* harmony export */   "__asyncDelegator": () => (/* binding */ __asyncDelegator),
-/* harmony export */   "__asyncValues": () => (/* binding */ __asyncValues),
-/* harmony export */   "__makeTemplateObject": () => (/* binding */ __makeTemplateObject),
-/* harmony export */   "__importStar": () => (/* binding */ __importStar),
-/* harmony export */   "__importDefault": () => (/* binding */ __importDefault),
-/* harmony export */   "__classPrivateFieldGet": () => (/* binding */ __classPrivateFieldGet),
-/* harmony export */   "__classPrivateFieldSet": () => (/* binding */ __classPrivateFieldSet)
-/* harmony export */ });
-/*! *****************************************************************************
-Copyright (c) Microsoft Corporation.
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
-REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
-AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
-INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
-LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-PERFORMANCE OF THIS SOFTWARE.
-***************************************************************************** */
-/* global Reflect, Promise */
-
-var extendStatics = function(d, b) {
-    extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-    return extendStatics(d, b);
-};
-
-function __extends(d, b) {
-    if (typeof b !== "function" && b !== null)
-        throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-    extendStatics(d, b);
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-}
-
-var __assign = function() {
-    __assign = Object.assign || function __assign(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
-        }
-        return t;
-    }
-    return __assign.apply(this, arguments);
-}
-
-function __rest(s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                t[p[i]] = s[p[i]];
-        }
-    return t;
-}
-
-function __decorate(decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-}
-
-function __param(paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-}
-
-function __metadata(metadataKey, metadataValue) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(metadataKey, metadataValue);
-}
-
-function __awaiter(thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-}
-
-function __generator(thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-}
-
-var __createBinding = Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-});
-
-function __exportStar(m, o) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(o, p)) __createBinding(o, m, p);
-}
-
-function __values(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) return m.call(o);
-    if (o && typeof o.length === "number") return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-}
-
-function __read(o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-}
-
-/** @deprecated */
-function __spread() {
-    for (var ar = [], i = 0; i < arguments.length; i++)
-        ar = ar.concat(__read(arguments[i]));
-    return ar;
-}
-
-/** @deprecated */
-function __spreadArrays() {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
-}
-
-function __spreadArray(to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || from);
-}
-
-function __await(v) {
-    return this instanceof __await ? (this.v = v, this) : new __await(v);
-}
-
-function __asyncGenerator(thisArg, _arguments, generator) {
-    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
-    var g = generator.apply(thisArg, _arguments || []), i, q = [];
-    return i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i;
-    function verb(n) { if (g[n]) i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; }
-    function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }
-    function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }
-    function fulfill(value) { resume("next", value); }
-    function reject(value) { resume("throw", value); }
-    function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }
-}
-
-function __asyncDelegator(o) {
-    var i, p;
-    return i = {}, verb("next"), verb("throw", function (e) { throw e; }), verb("return"), i[Symbol.iterator] = function () { return this; }, i;
-    function verb(n, f) { i[n] = o[n] ? function (v) { return (p = !p) ? { value: __await(o[n](v)), done: n === "return" } : f ? f(v) : v; } : f; }
-}
-
-function __asyncValues(o) {
-    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
-    var m = o[Symbol.asyncIterator], i;
-    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
-    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
-    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
-}
-
-function __makeTemplateObject(cooked, raw) {
-    if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
-    return cooked;
-};
-
-var __setModuleDefault = Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-};
-
-function __importStar(mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-}
-
-function __importDefault(mod) {
-    return (mod && mod.__esModule) ? mod : { default: mod };
-}
-
-function __classPrivateFieldGet(receiver, state, kind, f) {
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
-    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
-}
-
-function __classPrivateFieldSet(receiver, state, value, kind, f) {
-    if (kind === "m") throw new TypeError("Private method is not writable");
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
-    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
-}
-
-
-/***/ }),
-
 /***/ 1631:
 /*!******************************************************************!*\
   !*** ./node_modules/@angular/animations/fesm2015/animations.mjs ***!
@@ -23405,7 +23146,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "ɵPRE_STYLE": () => (/* binding */ ɵPRE_STYLE)
 /* harmony export */ });
 /**
- * @license Angular v13.2.3
+ * @license Angular v13.2.7
  * (c) 2010-2022 Google LLC. https://angular.io/
  * License: MIT
  */
@@ -24644,13 +24385,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "ɵWebAnimationsStyleNormalizer": () => (/* binding */ WebAnimationsStyleNormalizer),
 /* harmony export */   "ɵallowPreviousPlayerStylesMerge": () => (/* binding */ allowPreviousPlayerStylesMerge),
 /* harmony export */   "ɵcontainsElement": () => (/* binding */ containsElement),
+/* harmony export */   "ɵgetParentElement": () => (/* binding */ getParentElement),
 /* harmony export */   "ɵinvokeQuery": () => (/* binding */ invokeQuery),
 /* harmony export */   "ɵvalidateStyleProperty": () => (/* binding */ validateStyleProperty)
 /* harmony export */ });
 /* harmony import */ var _angular_animations__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/animations */ 1631);
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ 3184);
 /**
- * @license Angular v13.2.3
+ * @license Angular v13.2.7
  * (c) 2010-2022 Google LLC. https://angular.io/
  * License: MIT
  */
@@ -24665,223 +24407,223 @@ __webpack_require__.r(__webpack_exports__);
  * found in the LICENSE file at https://angular.io/license
  */
 
-const NG_DEV_MODE = typeof ngDevMode === 'undefined' || !!ngDevMode;
+const NG_DEV_MODE$1 = typeof ngDevMode === 'undefined' || !!ngDevMode;
 const LINE_START = '\n - ';
 
 function invalidTimingValue(exp) {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3000
   /* INVALID_TIMING_VALUE */
-  , NG_DEV_MODE && `The provided timing value "${exp}" is invalid.`);
+  , NG_DEV_MODE$1 && `The provided timing value "${exp}" is invalid.`);
 }
 
 function negativeStepValue() {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3100
   /* NEGATIVE_STEP_VALUE */
-  , NG_DEV_MODE && 'Duration values below 0 are not allowed for this animation step.');
+  , NG_DEV_MODE$1 && 'Duration values below 0 are not allowed for this animation step.');
 }
 
 function negativeDelayValue() {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3101
   /* NEGATIVE_DELAY_VALUE */
-  , NG_DEV_MODE && 'Delay values below 0 are not allowed for this animation step.');
+  , NG_DEV_MODE$1 && 'Delay values below 0 are not allowed for this animation step.');
 }
 
 function invalidStyleParams(varName) {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3001
   /* INVALID_STYLE_PARAMS */
-  , NG_DEV_MODE && `Unable to resolve the local animation param ${varName} in the given list of values`);
+  , NG_DEV_MODE$1 && `Unable to resolve the local animation param ${varName} in the given list of values`);
 }
 
 function invalidParamValue(varName) {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3003
   /* INVALID_PARAM_VALUE */
-  , NG_DEV_MODE && `Please provide a value for the animation param ${varName}`);
+  , NG_DEV_MODE$1 && `Please provide a value for the animation param ${varName}`);
 }
 
 function invalidNodeType(nodeType) {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3004
   /* INVALID_NODE_TYPE */
-  , NG_DEV_MODE && `Unable to resolve animation metadata node #${nodeType}`);
+  , NG_DEV_MODE$1 && `Unable to resolve animation metadata node #${nodeType}`);
 }
 
 function invalidCssUnitValue(userProvidedProperty, value) {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3005
   /* INVALID_CSS_UNIT_VALUE */
-  , NG_DEV_MODE && `Please provide a CSS unit value for ${userProvidedProperty}:${value}`);
+  , NG_DEV_MODE$1 && `Please provide a CSS unit value for ${userProvidedProperty}:${value}`);
 }
 
 function invalidTrigger() {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3006
   /* INVALID_TRIGGER */
-  , NG_DEV_MODE && 'animation triggers cannot be prefixed with an `@` sign (e.g. trigger(\'@foo\', [...]))');
+  , NG_DEV_MODE$1 && 'animation triggers cannot be prefixed with an `@` sign (e.g. trigger(\'@foo\', [...]))');
 }
 
 function invalidDefinition() {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3007
   /* INVALID_DEFINITION */
-  , NG_DEV_MODE && 'only state() and transition() definitions can sit inside of a trigger()');
+  , NG_DEV_MODE$1 && 'only state() and transition() definitions can sit inside of a trigger()');
 }
 
 function invalidState(metadataName, missingSubs) {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3008
   /* INVALID_STATE */
-  , NG_DEV_MODE && `state("${metadataName}", ...) must define default values for all the following style substitutions: ${missingSubs.join(', ')}`);
+  , NG_DEV_MODE$1 && `state("${metadataName}", ...) must define default values for all the following style substitutions: ${missingSubs.join(', ')}`);
 }
 
 function invalidStyleValue(value) {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3002
   /* INVALID_STYLE_VALUE */
-  , NG_DEV_MODE && `The provided style string value ${value} is not allowed.`);
+  , NG_DEV_MODE$1 && `The provided style string value ${value} is not allowed.`);
 }
 
 function invalidProperty(prop) {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3009
   /* INVALID_PROPERTY */
-  , NG_DEV_MODE && `The provided animation property "${prop}" is not a supported CSS property for animations`);
+  , NG_DEV_MODE$1 && `The provided animation property "${prop}" is not a supported CSS property for animations`);
 }
 
 function invalidParallelAnimation(prop, firstStart, firstEnd, secondStart, secondEnd) {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3010
   /* INVALID_PARALLEL_ANIMATION */
-  , NG_DEV_MODE && `The CSS property "${prop}" that exists between the times of "${firstStart}ms" and "${firstEnd}ms" is also being animated in a parallel animation between the times of "${secondStart}ms" and "${secondEnd}ms"`);
+  , NG_DEV_MODE$1 && `The CSS property "${prop}" that exists between the times of "${firstStart}ms" and "${firstEnd}ms" is also being animated in a parallel animation between the times of "${secondStart}ms" and "${secondEnd}ms"`);
 }
 
 function invalidKeyframes() {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3011
   /* INVALID_KEYFRAMES */
-  , NG_DEV_MODE && `keyframes() must be placed inside of a call to animate()`);
+  , NG_DEV_MODE$1 && `keyframes() must be placed inside of a call to animate()`);
 }
 
 function invalidOffset() {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3012
   /* INVALID_OFFSET */
-  , NG_DEV_MODE && `Please ensure that all keyframe offsets are between 0 and 1`);
+  , NG_DEV_MODE$1 && `Please ensure that all keyframe offsets are between 0 and 1`);
 }
 
 function keyframeOffsetsOutOfOrder() {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3200
   /* KEYFRAME_OFFSETS_OUT_OF_ORDER */
-  , NG_DEV_MODE && `Please ensure that all keyframe offsets are in order`);
+  , NG_DEV_MODE$1 && `Please ensure that all keyframe offsets are in order`);
 }
 
 function keyframesMissingOffsets() {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3202
   /* KEYFRAMES_MISSING_OFFSETS */
-  , NG_DEV_MODE && `Not all style() steps within the declared keyframes() contain offsets`);
+  , NG_DEV_MODE$1 && `Not all style() steps within the declared keyframes() contain offsets`);
 }
 
 function invalidStagger() {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3013
   /* INVALID_STAGGER */
-  , NG_DEV_MODE && `stagger() can only be used inside of query()`);
+  , NG_DEV_MODE$1 && `stagger() can only be used inside of query()`);
 }
 
 function invalidQuery(selector) {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3014
   /* INVALID_QUERY */
-  , NG_DEV_MODE && `\`query("${selector}")\` returned zero elements. (Use \`query("${selector}", { optional: true })\` if you wish to allow this.)`);
+  , NG_DEV_MODE$1 && `\`query("${selector}")\` returned zero elements. (Use \`query("${selector}", { optional: true })\` if you wish to allow this.)`);
 }
 
 function invalidExpression(expr) {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3015
   /* INVALID_EXPRESSION */
-  , NG_DEV_MODE && `The provided transition expression "${expr}" is not supported`);
+  , NG_DEV_MODE$1 && `The provided transition expression "${expr}" is not supported`);
 }
 
 function invalidTransitionAlias(alias) {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3016
   /* INVALID_TRANSITION_ALIAS */
-  , NG_DEV_MODE && `The transition alias value "${alias}" is not supported`);
+  , NG_DEV_MODE$1 && `The transition alias value "${alias}" is not supported`);
 }
 
 function validationFailed(errors) {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3500
   /* VALIDATION_FAILED */
-  , NG_DEV_MODE && `animation validation failed:\n${errors.map(err => err.message).join('\n')}`);
+  , NG_DEV_MODE$1 && `animation validation failed:\n${errors.map(err => err.message).join('\n')}`);
 }
 
 function buildingFailed(errors) {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3501
   /* BUILDING_FAILED */
-  , NG_DEV_MODE && `animation building failed:\n${errors.map(err => err.message).join('\n')}`);
+  , NG_DEV_MODE$1 && `animation building failed:\n${errors.map(err => err.message).join('\n')}`);
 }
 
 function triggerBuildFailed(name, errors) {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3404
   /* TRIGGER_BUILD_FAILED */
-  , NG_DEV_MODE && `The animation trigger "${name}" has failed to build due to the following errors:\n - ${errors.map(err => err.message).join('\n - ')}`);
+  , NG_DEV_MODE$1 && `The animation trigger "${name}" has failed to build due to the following errors:\n - ${errors.map(err => err.message).join('\n - ')}`);
 }
 
 function animationFailed(errors) {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3502
   /* ANIMATION_FAILED */
-  , NG_DEV_MODE && `Unable to animate due to the following errors:${LINE_START}${errors.map(err => err.message).join(LINE_START)}`);
+  , NG_DEV_MODE$1 && `Unable to animate due to the following errors:${LINE_START}${errors.map(err => err.message).join(LINE_START)}`);
 }
 
 function registerFailed(errors) {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3503
   /* REGISTRATION_FAILED */
-  , NG_DEV_MODE && `Unable to build the animation due to the following errors: ${errors.map(err => err.message).join('\n')}`);
+  , NG_DEV_MODE$1 && `Unable to build the animation due to the following errors: ${errors.map(err => err.message).join('\n')}`);
 }
 
 function missingOrDestroyedAnimation() {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3300
   /* MISSING_OR_DESTROYED_ANIMATION */
-  , NG_DEV_MODE && 'The requested animation doesn\'t exist or has already been destroyed');
+  , NG_DEV_MODE$1 && 'The requested animation doesn\'t exist or has already been destroyed');
 }
 
 function createAnimationFailed(errors) {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3504
   /* CREATE_ANIMATION_FAILED */
-  , NG_DEV_MODE && `Unable to create the animation due to the following errors:${errors.map(err => err.message).join('\n')}`);
+  , NG_DEV_MODE$1 && `Unable to create the animation due to the following errors:${errors.map(err => err.message).join('\n')}`);
 }
 
 function missingPlayer(id) {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3301
   /* MISSING_PLAYER */
-  , NG_DEV_MODE && `Unable to find the timeline player referenced by ${id}`);
+  , NG_DEV_MODE$1 && `Unable to find the timeline player referenced by ${id}`);
 }
 
 function missingTrigger(phase, name) {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3302
   /* MISSING_TRIGGER */
-  , NG_DEV_MODE && `Unable to listen on the animation trigger event "${phase}" because the animation trigger "${name}" doesn\'t exist!`);
+  , NG_DEV_MODE$1 && `Unable to listen on the animation trigger event "${phase}" because the animation trigger "${name}" doesn\'t exist!`);
 }
 
 function missingEvent(name) {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3303
   /* MISSING_EVENT */
-  , NG_DEV_MODE && `Unable to listen on the animation trigger "${name}" because the provided event is undefined!`);
+  , NG_DEV_MODE$1 && `Unable to listen on the animation trigger "${name}" because the provided event is undefined!`);
 }
 
 function unsupportedTriggerEvent(phase, name) {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3400
   /* UNSUPPORTED_TRIGGER_EVENT */
-  , NG_DEV_MODE && `The provided animation trigger event "${phase}" for the animation trigger "${name}" is not supported!`);
+  , NG_DEV_MODE$1 && `The provided animation trigger event "${phase}" for the animation trigger "${name}" is not supported!`);
 }
 
 function unregisteredTrigger(name) {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3401
   /* UNREGISTERED_TRIGGER */
-  , NG_DEV_MODE && `The provided animation trigger "${name}" has not been registered!`);
+  , NG_DEV_MODE$1 && `The provided animation trigger "${name}" has not been registered!`);
 }
 
 function triggerTransitionsFailed(errors) {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3402
   /* TRIGGER_TRANSITIONS_FAILED */
-  , NG_DEV_MODE && `Unable to process animations due to the following failed trigger transitions\n ${errors.map(err => err.message).join('\n')}`);
+  , NG_DEV_MODE$1 && `Unable to process animations due to the following failed trigger transitions\n ${errors.map(err => err.message).join('\n')}`);
 }
 
 function triggerParsingFailed(name, errors) {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3403
   /* TRIGGER_PARSING_FAILED */
-  , NG_DEV_MODE && `Animation parsing for the ${name} trigger have failed:${LINE_START}${errors.map(err => err.message).join(LINE_START)}`);
+  , NG_DEV_MODE$1 && `Animation parsing for the ${name} trigger have failed:${LINE_START}${errors.map(err => err.message).join(LINE_START)}`);
 }
 
 function transitionFailed(name, errors) {
   return new _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵRuntimeError"](3505
   /* TRANSITION_FAILED */
-  , NG_DEV_MODE && `@${name} has failed due to:\n ${errors.map(err => err.message).join('\n- ')}`);
+  , NG_DEV_MODE$1 && `@${name} has failed due to:\n ${errors.map(err => err.message).join('\n- ')}`);
 }
 /**
  * @license
@@ -25039,7 +24781,19 @@ let _contains = (elm1, elm2) => false;
 
 let _query = (element, selector, multi) => {
   return [];
-}; // Define utility methods for browsers and platform-server(domino) where Element
+};
+
+let _documentElement = null;
+
+function getParentElement(element) {
+  const parent = element.parentNode || element.host; // consider host to support shadow DOM
+
+  if (parent === _documentElement) {
+    return null;
+  }
+
+  return parent;
+} // Define utility methods for browsers and platform-server(domino) where Element
 // and utility methods exist.
 
 
@@ -25049,13 +24803,17 @@ if (_isNode || typeof Element !== 'undefined') {
   if (!isBrowser()) {
     _contains = (elm1, elm2) => elm1.contains(elm2);
   } else {
+    // Read the document element in an IIFE that's been marked pure to avoid a top-level property
+    // read that may prevent tree-shaking.
+    _documentElement = /* @__PURE__ */(() => document.documentElement)();
+
     _contains = (elm1, elm2) => {
-      while (elm2 && elm2 !== document.documentElement) {
+      while (elm2) {
         if (elm2 === elm1) {
           return true;
         }
 
-        elm2 = elm2.parentNode || elm2.host; // consider host to support shadow DOM
+        elm2 = getParentElement(elm2);
       }
 
       return false;
@@ -25145,6 +24903,10 @@ class NoopAnimationDriver {
 
   containsElement(elm1, elm2) {
     return containsElement(elm1, elm2);
+  }
+
+  getParentElement(element) {
+    return getParentElement(element);
   }
 
   query(element, selector, multi) {
@@ -25577,6 +25339,43 @@ function computeStyle(element, prop) {
  */
 
 
+const NG_DEV_MODE = typeof ngDevMode === 'undefined' || !!ngDevMode;
+
+function createListOfWarnings(warnings) {
+  const LINE_START = '\n - ';
+  return `${LINE_START}${warnings.filter(Boolean).map(warning => warning).join(LINE_START)}`;
+}
+
+function warnValidation(warnings) {
+  NG_DEV_MODE && console.warn(`animation validation warnings:${createListOfWarnings(warnings)}`);
+}
+
+function warnTriggerBuild(name, warnings) {
+  NG_DEV_MODE && console.warn(`The animation trigger "${name}" has built with the following warnings:${createListOfWarnings(warnings)}`);
+}
+
+function warnRegister(warnings) {
+  NG_DEV_MODE && console.warn(`Animation built with the following warnings:${createListOfWarnings(warnings)}`);
+}
+
+function triggerParsingWarnings(name, warnings) {
+  NG_DEV_MODE && console.warn(`Animation parsing for the ${name} trigger presents the following warnings:${createListOfWarnings(warnings)}`);
+}
+
+function pushUnrecognizedPropertiesWarning(warnings, props) {
+  if (ngDevMode && props.length) {
+    warnings.push(`The provided CSS properties are not recognized properties supported for animations: ${props.join(', ')}`);
+  }
+}
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+
+
 const ANY_STATE = '*';
 
 function parseTransitionExpr(transitionValue, errors) {
@@ -25714,8 +25513,8 @@ const SELF_TOKEN_REGEX = new RegExp(`\s*${SELF_TOKEN}\s*,?`, 'g');
  * Otherwise an error will be thrown.
  */
 
-function buildAnimationAst(driver, metadata, errors) {
-  return new AnimationAstBuilderVisitor(driver).build(metadata, errors);
+function buildAnimationAst(driver, metadata, errors, warnings) {
+  return new AnimationAstBuilderVisitor(driver).build(metadata, errors, warnings);
 }
 
 const ROOT_SELECTOR = '';
@@ -25725,12 +25524,18 @@ class AnimationAstBuilderVisitor {
     this._driver = _driver;
   }
 
-  build(metadata, errors) {
+  build(metadata, errors, warnings) {
     const context = new AnimationAstBuilderContext(errors);
 
     this._resetContextStyleTimingState(context);
 
-    return visitDslNode(this, normalizeAnimationEntry(metadata), context);
+    const ast = visitDslNode(this, normalizeAnimationEntry(metadata), context);
+
+    if (context.unsupportedCSSPropertiesFound.size) {
+      pushUnrecognizedPropertiesWarning(warnings, [...context.unsupportedCSSPropertiesFound.keys()]);
+    }
+
+    return ast;
   }
 
   _resetContextStyleTimingState(context) {
@@ -25991,7 +25796,8 @@ class AnimationAstBuilderVisitor {
       if (typeof tuple == 'string') return;
       Object.keys(tuple).forEach(prop => {
         if (!this._driver.validateStyleProperty(prop)) {
-          context.errors.push(invalidProperty(prop));
+          delete tuple[prop];
+          context.unsupportedCSSPropertiesFound.add(prop);
           return;
         }
 
@@ -26204,6 +26010,7 @@ class AnimationAstBuilderContext {
     this.currentTime = 0;
     this.collectedStyles = {};
     this.options = null;
+    this.unsupportedCSSPropertiesFound = new Set();
   }
 
 }
@@ -27239,10 +27046,15 @@ class Animation {
   constructor(_driver, input) {
     this._driver = _driver;
     const errors = [];
-    const ast = buildAnimationAst(_driver, input, errors);
+    const warnings = [];
+    const ast = buildAnimationAst(_driver, input, errors, warnings);
 
     if (errors.length) {
       throw validationFailed(errors);
+    }
+
+    if (warnings.length) {
+      warnValidation(warnings);
     }
 
     this._animationAst = ast;
@@ -27551,11 +27363,16 @@ class TimelineAnimationEngine {
 
   register(id, metadata) {
     const errors = [];
-    const ast = buildAnimationAst(this._driver, metadata, errors);
+    const warnings = [];
+    const ast = buildAnimationAst(this._driver, metadata, errors, warnings);
 
     if (errors.length) {
       throw registerFailed(errors);
     } else {
+      if (warnings.length) {
+        warnRegister(warnings);
+      }
+
       this._animations[id] = ast;
     }
   }
@@ -28259,30 +28076,58 @@ class TransitionAnimationEngine {
   }
 
   _balanceNamespaceList(ns, hostElement) {
-    const limit = this._namespaceList.length - 1;
+    const namespaceList = this._namespaceList;
+    const namespacesByHostElement = this.namespacesByHostElement;
+    const limit = namespaceList.length - 1;
 
     if (limit >= 0) {
       let found = false;
 
-      for (let i = limit; i >= 0; i--) {
-        const nextNamespace = this._namespaceList[i];
+      if (this.driver.getParentElement !== undefined) {
+        // Fast path for when the driver implements `getParentElement`, which allows us to find the
+        // closest ancestor with an existing namespace that we can then insert `ns` after, without
+        // having to inspect all existing namespaces.
+        let ancestor = this.driver.getParentElement(hostElement);
 
-        if (this.driver.containsElement(nextNamespace.hostElement, hostElement)) {
-          this._namespaceList.splice(i + 1, 0, ns);
+        while (ancestor) {
+          const ancestorNs = namespacesByHostElement.get(ancestor);
 
-          found = true;
-          break;
+          if (ancestorNs) {
+            // An animation namespace has been registered for this ancestor, so we insert `ns`
+            // right after it to establish top-down ordering of animation namespaces.
+            const index = namespaceList.indexOf(ancestorNs);
+            namespaceList.splice(index + 1, 0, ns);
+            found = true;
+            break;
+          }
+
+          ancestor = this.driver.getParentElement(ancestor);
+        }
+      } else {
+        // Slow path for backwards compatibility if the driver does not implement
+        // `getParentElement`, to be removed once `getParentElement` is a required method.
+        for (let i = limit; i >= 0; i--) {
+          const nextNamespace = namespaceList[i];
+
+          if (this.driver.containsElement(nextNamespace.hostElement, hostElement)) {
+            namespaceList.splice(i + 1, 0, ns);
+            found = true;
+            break;
+          }
         }
       }
 
       if (!found) {
-        this._namespaceList.splice(0, 0, ns);
+        // No namespace exists that is an ancestor of `ns`, so `ns` is inserted at the front to
+        // ensure that any existing descendants are ordered after `ns`, retaining the desired
+        // top-down ordering.
+        namespaceList.unshift(ns);
       }
     } else {
-      this._namespaceList.push(ns);
+      namespaceList.push(ns);
     }
 
-    this.namespacesByHostElement.set(hostElement, ns);
+    namespacesByHostElement.set(hostElement, ns);
     return ns;
   }
 
@@ -29496,10 +29341,15 @@ class AnimationEngine {
 
     if (!trigger) {
       const errors = [];
-      const ast = buildAnimationAst(this._driver, metadata, errors);
+      const warnings = [];
+      const ast = buildAnimationAst(this._driver, metadata, errors, warnings);
 
       if (errors.length) {
         throw triggerBuildFailed(name, errors);
+      }
+
+      if (warnings.length) {
+        warnTriggerBuild(name, warnings);
       }
 
       trigger = buildTrigger(name, ast, this._normalizer);
@@ -29917,6 +29767,10 @@ class WebAnimationsDriver {
     return containsElement(elm1, elm2);
   }
 
+  getParentElement(element) {
+    return getParentElement(element);
+  }
+
   query(element, selector, multi) {
     return invokeQuery(element, selector, multi);
   }
@@ -30096,7 +29950,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ 3184);
 /**
- * @license Angular v13.2.3
+ * @license Angular v13.2.7
  * (c) 2010-2022 Google LLC. https://angular.io/
  * License: MIT
  */
@@ -33355,6 +33209,37 @@ function parseIntAutoRadix(text) {
 
 
 class NgLocalization {}
+
+NgLocalization.ɵfac = function NgLocalization_Factory(t) {
+  return new (t || NgLocalization)();
+};
+
+NgLocalization.ɵprov = /* @__PURE__ */_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineInjectable"]({
+  token: NgLocalization,
+  factory: function NgLocalization_Factory(t) {
+    let r = null;
+
+    if (t) {
+      r = new t();
+    } else {
+      r = (locale => new NgLocaleLocalization(locale))(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵinject"](_angular_core__WEBPACK_IMPORTED_MODULE_0__.LOCALE_ID));
+    }
+
+    return r;
+  },
+  providedIn: 'root'
+});
+
+(function () {
+  (typeof ngDevMode === "undefined" || ngDevMode) && _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](NgLocalization, [{
+    type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Injectable,
+    args: [{
+      providedIn: 'root',
+      useFactory: locale => new NgLocaleLocalization(locale),
+      deps: [_angular_core__WEBPACK_IMPORTED_MODULE_0__.LOCALE_ID]
+    }]
+  }], null, null);
+})();
 /**
  * Returns the plural category for a given value.
  * - "=value" when the case exists,
@@ -36628,23 +36513,14 @@ CommonModule.ɵfac = function CommonModule_Factory(t) {
 CommonModule.ɵmod = /* @__PURE__ */_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineNgModule"]({
   type: CommonModule
 });
-CommonModule.ɵinj = /* @__PURE__ */_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineInjector"]({
-  providers: [{
-    provide: NgLocalization,
-    useClass: NgLocaleLocalization
-  }]
-});
+CommonModule.ɵinj = /* @__PURE__ */_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineInjector"]({});
 
 (function () {
   (typeof ngDevMode === "undefined" || ngDevMode) && _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](CommonModule, [{
     type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.NgModule,
     args: [{
       declarations: [COMMON_DIRECTIVES, COMMON_PIPES],
-      exports: [COMMON_DIRECTIVES, COMMON_PIPES],
-      providers: [{
-        provide: NgLocalization,
-        useClass: NgLocaleLocalization
-      }]
+      exports: [COMMON_DIRECTIVES, COMMON_PIPES]
     }]
   }], null, null);
 })();
@@ -36709,7 +36585,7 @@ function isPlatformWorkerUi(platformId) {
  */
 
 
-const VERSION = new _angular_core__WEBPACK_IMPORTED_MODULE_0__.Version('13.2.3');
+const VERSION = new _angular_core__WEBPACK_IMPORTED_MODULE_0__.Version('13.2.7');
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
@@ -37047,7 +36923,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs/operators */ 9151);
 /* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs/operators */ 6942);
 /**
- * @license Angular v13.2.3
+ * @license Angular v13.2.7
  * (c) 2010-2022 Google LLC. https://angular.io/
  * License: MIT
  */
@@ -38759,7 +38635,13 @@ NoopInterceptor.ɵprov = /* @__PURE__ */_angular_core__WEBPACK_IMPORTED_MODULE_4
 // is shared among all applications on the page.
 
 
-let nextRequestId = 0; // Error text given when a JSONP script is injected, but doesn't invoke the callback
+let nextRequestId = 0;
+/**
+ * When a pending <script> is unsubscribed we'll move it to this document, so it won't be
+ * executed.
+ */
+
+let foreignDocument; // Error text given when a JSONP script is injected, but doesn't invoke the callback
 // passed in its URL.
 
 const JSONP_ERR_NO_CALLBACK = 'JSONP injected script did not invoke callback.'; // Error text given when a request is passed to the JsonpClientBackend that doesn't
@@ -38836,21 +38718,13 @@ class JsonpClientBackend {
 
       let body = null; // Whether the response callback has been called.
 
-      let finished = false; // Whether the request has been cancelled (and thus any other callbacks)
-      // should be ignored.
-
-      let cancelled = false; // Set the response callback in this.callbackMap (which will be the window
+      let finished = false; // Set the response callback in this.callbackMap (which will be the window
       // object in the browser. The script being loaded via the <script> tag will
       // eventually call this callback.
 
       this.callbackMap[callback] = data => {
         // Data has been received from the JSONP script. Firstly, delete this callback.
-        delete this.callbackMap[callback]; // Next, make sure the request wasn't cancelled in the meantime.
-
-        if (cancelled) {
-          return;
-        } // Set state to indicate data was received.
-
+        delete this.callbackMap[callback]; // Set state to indicate data was received.
 
         body = data;
         finished = true;
@@ -38875,14 +38749,9 @@ class JsonpClientBackend {
 
 
       const onLoad = event => {
-        // Do nothing if the request has been cancelled.
-        if (cancelled) {
-          return;
-        } // We wrap it in an extra Promise, to ensure the microtask
+        // We wrap it in an extra Promise, to ensure the microtask
         // is scheduled after the loaded endpoint has executed any potential microtask itself,
         // which is not guaranteed in Internet Explorer and EdgeHTML. See issue #39496
-
-
         this.resolvedPromise.then(() => {
           // Cleanup the page.
           cleanup(); // Check whether the response callback has run.
@@ -38918,11 +38787,6 @@ class JsonpClientBackend {
 
 
       const onError = error => {
-        // If the request was already cancelled, no need to emit anything.
-        if (cancelled) {
-          return;
-        }
-
         cleanup(); // Wrap the error in a HttpErrorResponse.
 
         observer.error(new HttpErrorResponse({
@@ -38944,15 +38808,25 @@ class JsonpClientBackend {
       }); // Cancellation handler.
 
       return () => {
-        // Track the cancellation so event listeners won't do anything even if already scheduled.
-        cancelled = true; // Remove the event listeners so they won't run if the events later fire.
+        if (!finished) {
+          this.removeListeners(node);
+        } // And finally, clean up the page.
 
-        node.removeEventListener('load', onLoad);
-        node.removeEventListener('error', onError); // And finally, clean up the page.
 
         cleanup();
       };
     });
+  }
+
+  removeListeners(script) {
+    // Issue #34818
+    // Changing <script>'s ownerDocument will prevent it from execution.
+    // https://html.spec.whatwg.org/multipage/scripting.html#execute-the-script-block
+    if (!foreignDocument) {
+      foreignDocument = this.document.implementation.createHTMLDocument();
+    }
+
+    foreignDocument.adoptNode(script);
   }
 
 }
@@ -40206,7 +40080,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs */ 8623);
 /* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! rxjs/operators */ 4514);
 /**
- * @license Angular v13.2.3
+ * @license Angular v13.2.7
  * (c) 2010-2022 Google LLC. https://angular.io/
  * License: MIT
  */
@@ -61295,7 +61169,7 @@ class Version {
 /**
  * @publicApi
  */
-const VERSION = new Version('13.2.3');
+const VERSION = new Version('13.2.7');
 
 /**
  * @license
@@ -61700,14 +61574,6 @@ function getNamespace(elementName) {
     const name = elementName.toLowerCase();
     return name === 'svg' ? SVG_NAMESPACE : (name === 'math' ? MATH_ML_NAMESPACE : null);
 }
-/**
- * A change detection scheduler token for {@link RootContext}. This token is the default value used
- * for the default `RootContext` found in the {@link ROOT_CONTEXT} token.
- */
-const SCHEDULER = new InjectionToken('SCHEDULER_TOKEN', {
-    providedIn: 'root',
-    factory: () => defaultScheduler,
-});
 function createChainedInjector(rootViewInjector, moduleInjector) {
     return {
         get: (token, notFoundValue, flags) => {
@@ -65011,10 +64877,11 @@ class ApplicationInitStatus {
     }
 }
 ApplicationInitStatus.ɵfac = function ApplicationInitStatus_Factory(t) { return new (t || ApplicationInitStatus)(ɵɵinject(APP_INITIALIZER, 8)); };
-ApplicationInitStatus.ɵprov = /*@__PURE__*/ ɵɵdefineInjectable({ token: ApplicationInitStatus, factory: ApplicationInitStatus.ɵfac });
+ApplicationInitStatus.ɵprov = /*@__PURE__*/ ɵɵdefineInjectable({ token: ApplicationInitStatus, factory: ApplicationInitStatus.ɵfac, providedIn: 'root' });
 (function () {
     (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(ApplicationInitStatus, [{
-            type: Injectable
+            type: Injectable,
+            args: [{ providedIn: 'root' }]
         }], function () {
         return [{ type: undefined, decorators: [{
                         type: Inject,
@@ -65043,7 +64910,10 @@ ApplicationInitStatus.ɵprov = /*@__PURE__*/ ɵɵdefineInjectable({ token: Appli
  *
  * @publicApi
  */
-const APP_ID = new InjectionToken('AppId');
+const APP_ID = new InjectionToken('AppId', {
+    providedIn: 'root',
+    factory: _appIdRandomProviderFactory,
+});
 function _appIdRandomProviderFactory() {
     return `${_randomChar()}${_randomChar()}${_randomChar()}`;
 }
@@ -65121,6 +64991,33 @@ Console.ɵprov = /*@__PURE__*/ ɵɵdefineInjectable({ token: Console, factory: C
  * found in the LICENSE file at https://angular.io/license
  */
 /**
+ * Work out the locale from the potential global properties.
+ *
+ * * Closure Compiler: use `goog.LOCALE`.
+ * * Ivy enabled: use `$localize.locale`
+ */
+function getGlobalLocale() {
+    if (typeof ngI18nClosureMode !== 'undefined' && ngI18nClosureMode &&
+        typeof goog !== 'undefined' && goog.LOCALE !== 'en') {
+        // * The default `goog.LOCALE` value is `en`, while Angular used `en-US`.
+        // * In order to preserve backwards compatibility, we use Angular default value over
+        //   Closure Compiler's one.
+        return goog.LOCALE;
+    }
+    else {
+        // KEEP `typeof $localize !== 'undefined' && $localize.locale` IN SYNC WITH THE LOCALIZE
+        // COMPILE-TIME INLINER.
+        //
+        // * During compile time inlining of translations the expression will be replaced
+        //   with a string literal that is the current locale. Other forms of this expression are not
+        //   guaranteed to be replaced.
+        //
+        // * During runtime translation evaluation, the developer is required to set `$localize.locale`
+        //   if required, or just to provide their own `LOCALE_ID` provider.
+        return (typeof $localize !== 'undefined' && $localize.locale) || DEFAULT_LOCALE_ID;
+    }
+}
+/**
  * Provide this token to set the locale of your application.
  * It is used for i18n extraction, by i18n pipes (DatePipe, I18nPluralPipe, CurrencyPipe,
  * DecimalPipe and PercentPipe) and by ICU expressions.
@@ -65142,7 +65039,10 @@ Console.ɵprov = /*@__PURE__*/ ɵɵdefineInjectable({ token: Console, factory: C
  *
  * @publicApi
  */
-const LOCALE_ID = new InjectionToken('LocaleId');
+const LOCALE_ID = new InjectionToken('LocaleId', {
+    providedIn: 'root',
+    factory: () => inject(LOCALE_ID, InjectFlags.Optional | InjectFlags.SkipSelf) || getGlobalLocale(),
+});
 /**
  * Provide this token to set the default currency code your application uses for
  * CurrencyPipe when there is no currency code passed into it. This is only used by
@@ -65181,7 +65081,10 @@ const LOCALE_ID = new InjectionToken('LocaleId');
  *
  * @publicApi
  */
-const DEFAULT_CURRENCY_CODE = new InjectionToken('DefaultCurrencyCode');
+const DEFAULT_CURRENCY_CODE = new InjectionToken('DefaultCurrencyCode', {
+    providedIn: 'root',
+    factory: () => USD_CURRENCY_CODE,
+});
 /**
  * Use this token at bootstrap to provide the content of your translation file (`xtb`,
  * `xlf` or `xlf2`) when you want to translate your application in another language.
@@ -65348,10 +65251,11 @@ class Compiler {
     }
 }
 Compiler.ɵfac = function Compiler_Factory(t) { return new (t || Compiler)(); };
-Compiler.ɵprov = /*@__PURE__*/ ɵɵdefineInjectable({ token: Compiler, factory: Compiler.ɵfac });
+Compiler.ɵprov = /*@__PURE__*/ ɵɵdefineInjectable({ token: Compiler, factory: Compiler.ɵfac, providedIn: 'root' });
 (function () {
     (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(Compiler, [{
-            type: Injectable
+            type: Injectable,
+            args: [{ providedIn: 'root' }]
         }], null, null);
 })();
 /**
@@ -66719,10 +66623,11 @@ class ApplicationRef {
     }
 }
 ApplicationRef.ɵfac = function ApplicationRef_Factory(t) { return new (t || ApplicationRef)(ɵɵinject(NgZone), ɵɵinject(Injector), ɵɵinject(ErrorHandler), ɵɵinject(ComponentFactoryResolver$1), ɵɵinject(ApplicationInitStatus)); };
-ApplicationRef.ɵprov = /*@__PURE__*/ ɵɵdefineInjectable({ token: ApplicationRef, factory: ApplicationRef.ɵfac });
+ApplicationRef.ɵprov = /*@__PURE__*/ ɵɵdefineInjectable({ token: ApplicationRef, factory: ApplicationRef.ɵfac, providedIn: 'root' });
 (function () {
     (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(ApplicationRef, [{
-            type: Injectable
+            type: Injectable,
+            args: [{ providedIn: 'root' }]
         }], function () { return [{ type: NgZone }, { type: Injector }, { type: ErrorHandler }, { type: ComponentFactoryResolver$1 }, { type: ApplicationInitStatus }]; }, null);
 })();
 function remove(list, el) {
@@ -68721,102 +68626,9 @@ const _CORE_PLATFORM_PROVIDERS = [
 const platformCore = createPlatformFactory(null, 'core', _CORE_PLATFORM_PROVIDERS);
 
 /**
- * @license
- * Copyright Google LLC All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
-function _iterableDiffersFactory() {
-    return defaultIterableDiffers;
-}
-function _keyValueDiffersFactory() {
-    return defaultKeyValueDiffers;
-}
-function _localeFactory(locale) {
-    return locale || getGlobalLocale();
-}
-/**
- * Work out the locale from the potential global properties.
- *
- * * Closure Compiler: use `goog.getLocale()`.
- * * Ivy enabled: use `$localize.locale`
- */
-function getGlobalLocale() {
-    if (typeof ngI18nClosureMode !== 'undefined' && ngI18nClosureMode &&
-        typeof goog !== 'undefined' && goog.getLocale() !== 'en') {
-        // * The default `goog.getLocale()` value is `en`, while Angular used `en-US`.
-        // * In order to preserve backwards compatibility, we use Angular default value over
-        //   Closure Compiler's one.
-        return goog.getLocale();
-    }
-    else {
-        // KEEP `typeof $localize !== 'undefined' && $localize.locale` IN SYNC WITH THE LOCALIZE
-        // COMPILE-TIME INLINER.
-        //
-        // * During compile time inlining of translations the expression will be replaced
-        //   with a string literal that is the current locale. Other forms of this expression are not
-        //   guaranteed to be replaced.
-        //
-        // * During runtime translation evaluation, the developer is required to set `$localize.locale`
-        //   if required, or just to provide their own `LOCALE_ID` provider.
-        return (typeof $localize !== 'undefined' && $localize.locale) || DEFAULT_LOCALE_ID;
-    }
-}
-/**
- * A built-in [dependency injection token](guide/glossary#di-token)
- * that is used to configure the root injector for bootstrapping.
- */
-const APPLICATION_MODULE_PROVIDERS = [
-    {
-        provide: ApplicationRef,
-        useClass: ApplicationRef,
-        deps: [NgZone, Injector, ErrorHandler, ComponentFactoryResolver$1, ApplicationInitStatus]
-    },
-    { provide: SCHEDULER, deps: [NgZone], useFactory: zoneSchedulerFactory },
-    {
-        provide: ApplicationInitStatus,
-        useClass: ApplicationInitStatus,
-        deps: [[new Optional(), APP_INITIALIZER]]
-    },
-    { provide: Compiler, useClass: Compiler, deps: [] },
-    APP_ID_RANDOM_PROVIDER,
-    { provide: IterableDiffers, useFactory: _iterableDiffersFactory, deps: [] },
-    { provide: KeyValueDiffers, useFactory: _keyValueDiffersFactory, deps: [] },
-    {
-        provide: LOCALE_ID,
-        useFactory: _localeFactory,
-        deps: [[new Inject(LOCALE_ID), new Optional(), new SkipSelf()]]
-    },
-    { provide: DEFAULT_CURRENCY_CODE, useValue: USD_CURRENCY_CODE },
-];
-/**
- * Schedule work at next available slot.
- *
- * In Ivy this is just `requestAnimationFrame`. For compatibility reasons when bootstrapped
- * using `platformRef.bootstrap` we need to use `NgZone.onStable` as the scheduling mechanism.
- * This overrides the scheduling mechanism in Ivy to `NgZone.onStable`.
- *
- * @param ngZone NgZone to use for scheduling.
- */
-function zoneSchedulerFactory(ngZone) {
-    let queue = [];
-    ngZone.onStable.subscribe(() => {
-        while (queue.length) {
-            queue.pop()();
-        }
-    });
-    return function (fn) {
-        queue.push(fn);
-    };
-}
-/**
- * Configures the root injector for an app with
- * providers of `@angular/core` dependencies that `ApplicationRef` needs
- * to bootstrap components.
- *
  * Re-exported by `BrowserModule`, which is included automatically in the root
- * `AppModule` when you create a new app with the CLI `new` command.
+ * `AppModule` when you create a new app with the CLI `new` command. Eagerly injects
+ * `ApplicationRef` to instantiate it.
  *
  * @publicApi
  */
@@ -68826,11 +68638,10 @@ class ApplicationModule {
 }
 ApplicationModule.ɵfac = function ApplicationModule_Factory(t) { return new (t || ApplicationModule)(ɵɵinject(ApplicationRef)); };
 ApplicationModule.ɵmod = /*@__PURE__*/ ɵɵdefineNgModule({ type: ApplicationModule });
-ApplicationModule.ɵinj = /*@__PURE__*/ ɵɵdefineInjector({ providers: APPLICATION_MODULE_PROVIDERS });
+ApplicationModule.ɵinj = /*@__PURE__*/ ɵɵdefineInjector({});
 (function () {
     (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(ApplicationModule, [{
-            type: NgModule,
-            args: [{ providers: APPLICATION_MODULE_PROVIDERS }]
+            type: NgModule
         }], function () { return [{ type: ApplicationRef }]; }, null);
 })();
 
@@ -69059,7 +68870,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs */ 4350);
 /* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! rxjs/operators */ 6942);
 /**
- * @license Angular v13.2.3
+ * @license Angular v13.2.7
  * (c) 2010-2022 Google LLC. https://angular.io/
  * License: MIT
  */
@@ -71215,17 +71026,22 @@ function _noControlError(dir) {
 }
 
 function _throwError(dir, message) {
-  let messageEnd;
-
-  if (dir.path.length > 1) {
-    messageEnd = `path: '${dir.path.join(' -> ')}'`;
-  } else if (dir.path[0]) {
-    messageEnd = `name: '${dir.path}'`;
-  } else {
-    messageEnd = 'unspecified name attribute';
-  }
+  const messageEnd = _describeControlLocation(dir);
 
   throw new Error(`${message} ${messageEnd}`);
+}
+
+function _describeControlLocation(dir) {
+  const path = dir.path;
+  if (path && path.length > 1) return `path: '${path.join(' -> ')}'`;
+  if (path === null || path === void 0 ? void 0 : path[0]) return `name: '${path}'`;
+  return 'unspecified name attribute';
+}
+
+function _throwInvalidValueAccessorError(dir) {
+  const loc = _describeControlLocation(dir);
+
+  throw new Error(`Value accessor was not provided as an array for form control with ${loc}. ` + `Check that the \`NG_VALUE_ACCESSOR\` token is configured as a \`multi: true\` provider.`);
 }
 
 function isPropertyUpdated(changes, viewModel) {
@@ -71257,7 +71073,7 @@ function syncPendingControls(form, directives) {
 
 function selectValueAccessor(dir, valueAccessors) {
   if (!valueAccessors) return null;
-  if (!Array.isArray(valueAccessors) && (typeof ngDevMode === 'undefined' || ngDevMode)) _throwError(dir, 'Value accessor was not provided as an array for form control with');
+  if (!Array.isArray(valueAccessors) && (typeof ngDevMode === 'undefined' || ngDevMode)) _throwInvalidValueAccessorError(dir);
   let defaultAccessor = undefined;
   let builtinAccessor = undefined;
   let customAccessor = undefined;
@@ -78313,7 +78129,7 @@ FormBuilder.ɵprov = /* @__PURE__ */_angular_core__WEBPACK_IMPORTED_MODULE_0__["
  */
 
 
-const VERSION = new _angular_core__WEBPACK_IMPORTED_MODULE_0__.Version('13.2.3');
+const VERSION = new _angular_core__WEBPACK_IMPORTED_MODULE_0__.Version('13.2.7');
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
@@ -78371,7 +78187,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_animations_browser__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/animations/browser */ 289);
 /* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/common */ 6362);
 /**
- * @license Angular v13.2.3
+ * @license Angular v13.2.7
  * (c) 2010-2022 Google LLC. https://angular.io/
  * License: MIT
  */
@@ -79092,7 +78908,6 @@ NoopAnimationsModule.ɵinj = /* @__PURE__ */_angular_core__WEBPACK_IMPORTED_MODU
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ɵgetDOM": () => (/* reexport safe */ _angular_common__WEBPACK_IMPORTED_MODULE_0__["ɵgetDOM"]),
 /* harmony export */   "BrowserModule": () => (/* binding */ BrowserModule),
 /* harmony export */   "BrowserTransferStateModule": () => (/* binding */ BrowserTransferStateModule),
 /* harmony export */   "By": () => (/* binding */ By),
@@ -79125,6 +78940,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "ɵTRANSITION_ID": () => (/* binding */ TRANSITION_ID),
 /* harmony export */   "ɵescapeHtml": () => (/* binding */ escapeHtml),
 /* harmony export */   "ɵflattenStyles": () => (/* binding */ flattenStyles),
+/* harmony export */   "ɵgetDOM": () => (/* reexport safe */ _angular_common__WEBPACK_IMPORTED_MODULE_0__["ɵgetDOM"]),
 /* harmony export */   "ɵinitDomAdapter": () => (/* binding */ initDomAdapter),
 /* harmony export */   "ɵshimContentAttribute": () => (/* binding */ shimContentAttribute),
 /* harmony export */   "ɵshimHostAttribute": () => (/* binding */ shimHostAttribute)
@@ -79132,7 +78948,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/common */ 6362);
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ 3184);
 /**
- * @license Angular v13.2.3
+ * @license Angular v13.2.7
  * (c) 2010-2022 Google LLC. https://angular.io/
  * License: MIT
  */
@@ -81865,7 +81681,7 @@ DomSanitizerImpl.ɵprov = /* @__PURE__ */_angular_core__WEBPACK_IMPORTED_MODULE_
  */
 
 
-const VERSION = new _angular_core__WEBPACK_IMPORTED_MODULE_1__.Version('13.2.3');
+const VERSION = new _angular_core__WEBPACK_IMPORTED_MODULE_1__.Version('13.2.7');
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
@@ -81966,13 +81782,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs */ 4139);
 /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs */ 4505);
 /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! rxjs */ 9193);
-/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! rxjs */ 2378);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! rxjs */ 6587);
 /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! rxjs */ 213);
 /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! rxjs */ 5828);
 /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! rxjs */ 1635);
-/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! rxjs */ 6439);
-/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! rxjs */ 4483);
-/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! rxjs */ 2218);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! rxjs */ 2378);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! rxjs */ 6439);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! rxjs */ 4483);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! rxjs */ 2218);
 /* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! rxjs/operators */ 6942);
 /* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! rxjs/operators */ 9095);
 /* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! rxjs/operators */ 3910);
@@ -81985,13 +81802,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! rxjs/operators */ 5670);
 /* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! rxjs/operators */ 522);
 /* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! rxjs/operators */ 8759);
-/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! rxjs/operators */ 2160);
-/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! rxjs/operators */ 8331);
-/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! rxjs/operators */ 4661);
-/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! rxjs/operators */ 6675);
-/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! @angular/common */ 6362);
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! rxjs/operators */ 2160);
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! rxjs/operators */ 8331);
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! rxjs/operators */ 4661);
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! rxjs/operators */ 6675);
+/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! @angular/common */ 6362);
 /**
- * @license Angular v13.2.3
+ * @license Angular v13.2.7
  * (c) 2010-2022 Google LLC. https://angular.io/
  * License: MIT
  */
@@ -83998,18 +83815,18 @@ function createActivatedRoute(c) {
 
 function createUrlTree(route, urlTree, commands, queryParams, fragment) {
   if (commands.length === 0) {
-    return tree(urlTree.root, urlTree.root, urlTree, queryParams, fragment);
+    return tree(urlTree.root, urlTree.root, urlTree.root, queryParams, fragment);
   }
 
   const nav = computeNavigation(commands);
 
   if (nav.toRoot()) {
-    return tree(urlTree.root, new UrlSegmentGroup([], {}), urlTree, queryParams, fragment);
+    return tree(urlTree.root, urlTree.root, new UrlSegmentGroup([], {}), queryParams, fragment);
   }
 
   const startingPosition = findStartingPosition(nav, urlTree, route);
   const segmentGroup = startingPosition.processChildren ? updateSegmentGroupChildren(startingPosition.segmentGroup, startingPosition.index, nav.commands) : updateSegmentGroup(startingPosition.segmentGroup, startingPosition.index, nav.commands);
-  return tree(startingPosition.segmentGroup, segmentGroup, urlTree, queryParams, fragment);
+  return tree(urlTree.root, startingPosition.segmentGroup, segmentGroup, queryParams, fragment);
 }
 
 function isMatrixParams(command) {
@@ -84025,7 +83842,7 @@ function isCommandWithOutlets(command) {
   return typeof command === 'object' && command != null && command.outlets;
 }
 
-function tree(oldSegmentGroup, newSegmentGroup, urlTree, queryParams, fragment) {
+function tree(oldRoot, oldSegmentGroup, newSegmentGroup, queryParams, fragment) {
   let qp = {};
 
   if (queryParams) {
@@ -84034,11 +83851,12 @@ function tree(oldSegmentGroup, newSegmentGroup, urlTree, queryParams, fragment) 
     });
   }
 
-  if (urlTree.root === oldSegmentGroup) {
+  if (oldRoot === oldSegmentGroup) {
     return new UrlTree(newSegmentGroup, qp, fragment);
   }
 
-  return new UrlTree(replaceSegment(urlTree.root, oldSegmentGroup, newSegmentGroup), qp, fragment);
+  const newRoot = replaceSegment(oldRoot, oldSegmentGroup, newSegmentGroup);
+  return new UrlTree(newRoot, qp, fragment);
 }
 
 function replaceSegment(current, oldSegment, newSegment) {
@@ -85211,7 +85029,7 @@ function sortByMatchingOutlets(routes, outletName) {
 const noMatch$1 = {
   matched: false,
   consumedSegments: [],
-  lastChild: 0,
+  remainingSegments: [],
   parameters: {},
   positionalParamSegments: {}
 };
@@ -85227,7 +85045,7 @@ function match(segmentGroup, route, segments) {
     return {
       matched: true,
       consumedSegments: [],
-      lastChild: 0,
+      remainingSegments: segments,
       parameters: {},
       positionalParamSegments: {}
     };
@@ -85244,7 +85062,7 @@ function match(segmentGroup, route, segments) {
   return {
     matched: true,
     consumedSegments: res.consumed,
-    lastChild: res.consumed.length,
+    remainingSegments: segments.slice(res.consumed.length),
     // TODO(atscott): investigate combining parameters and positionalParamSegments
     parameters,
     positionalParamSegments: (_a = res.posParams) !== null && _a !== void 0 ? _a : {}
@@ -85392,19 +85210,19 @@ class AbsoluteRedirect {
 }
 
 function noMatch(segmentGroup) {
-  return new rxjs__WEBPACK_IMPORTED_MODULE_11__.Observable(obs => obs.error(new NoMatch$1(segmentGroup)));
+  return (0,rxjs__WEBPACK_IMPORTED_MODULE_11__.throwError)(new NoMatch$1(segmentGroup));
 }
 
 function absoluteRedirect(newTree) {
-  return new rxjs__WEBPACK_IMPORTED_MODULE_11__.Observable(obs => obs.error(new AbsoluteRedirect(newTree)));
+  return (0,rxjs__WEBPACK_IMPORTED_MODULE_11__.throwError)(new AbsoluteRedirect(newTree));
 }
 
 function namedOutletsRedirect(redirectTo) {
-  return new rxjs__WEBPACK_IMPORTED_MODULE_11__.Observable(obs => obs.error(new Error(`Only absolute redirects can have named outlets. redirectTo: '${redirectTo}'`)));
+  return (0,rxjs__WEBPACK_IMPORTED_MODULE_11__.throwError)(new Error(`Only absolute redirects can have named outlets. redirectTo: '${redirectTo}'`));
 }
 
 function canLoadFails(route) {
-  return new rxjs__WEBPACK_IMPORTED_MODULE_11__.Observable(obs => obs.error(navigationCancelingError(`Cannot load children because the guard of the route "path: '${route.path}'" returned false`)));
+  return (0,rxjs__WEBPACK_IMPORTED_MODULE_11__.throwError)(navigationCancelingError(`Cannot load children because the guard of the route "path: '${route.path}'" returned false`));
 }
 /**
  * Returns the `UrlTree` with the redirection applied.
@@ -85536,7 +85354,7 @@ class ApplyRedirects {
           return (0,rxjs__WEBPACK_IMPORTED_MODULE_2__.of)(new UrlSegmentGroup([], {}));
         }
 
-        throw new NoMatch$1(segmentGroup);
+        return noMatch(segmentGroup);
       }
 
       throw e;
@@ -85584,7 +85402,7 @@ class ApplyRedirects {
     const {
       matched,
       consumedSegments,
-      lastChild,
+      remainingSegments,
       positionalParamSegments
     } = match(segmentGroup, route, segments);
     if (!matched) return noMatch(segmentGroup);
@@ -85595,7 +85413,7 @@ class ApplyRedirects {
     }
 
     return this.lineralizeSegments(route, newTree).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_17__.mergeMap)(newSegments => {
-      return this.expandSegment(ngModule, segmentGroup, routes, newSegments.concat(segments.slice(lastChild)), outlet, false);
+      return this.expandSegment(ngModule, segmentGroup, routes, newSegments.concat(remainingSegments), outlet, false);
     }));
   }
 
@@ -85615,10 +85433,9 @@ class ApplyRedirects {
     const {
       matched,
       consumedSegments,
-      lastChild
+      remainingSegments
     } = match(rawSegmentGroup, route, segments);
     if (!matched) return noMatch(rawSegmentGroup);
-    const rawSlicedSegments = segments.slice(lastChild);
     const childConfig$ = this.getChildConfig(ngModule, route, segments);
     return childConfig$.pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_17__.mergeMap)(routerConfig => {
       const childModule = routerConfig.module;
@@ -85626,7 +85443,7 @@ class ApplyRedirects {
       const {
         segmentGroup: splitSegmentGroup,
         slicedSegments
-      } = split(rawSegmentGroup, consumedSegments, rawSlicedSegments, childConfig); // See comment on the other call to `split` about why this is necessary.
+      } = split(rawSegmentGroup, consumedSegments, remainingSegments, childConfig); // See comment on the other call to `split` about why this is necessary.
 
       const segmentGroup = new UrlSegmentGroup(splitSegmentGroup.segments, splitSegmentGroup.children);
 
@@ -86153,7 +85970,7 @@ class NoMatch {}
 
 function newObservableError(e) {
   // TODO(atscott): This pattern is used throughout the router code and can be `throwError` instead.
-  return new rxjs__WEBPACK_IMPORTED_MODULE_11__.Observable(obs => obs.error(e));
+  return new rxjs__WEBPACK_IMPORTED_MODULE_21__.Observable(obs => obs.error(e));
 }
 
 function recognize$1(rootComponentType, config, urlTree, url, paramsInheritanceStrategy = 'emptyOnly', relativeLinkResolution = 'legacy') {
@@ -86278,7 +86095,7 @@ class Recognizer {
     if (route.redirectTo || !isImmediateMatch(route, rawSegment, segments, outlet)) return null;
     let snapshot;
     let consumedSegments = [];
-    let rawSlicedSegments = [];
+    let remainingSegments = [];
 
     if (route.path === '**') {
       const params = segments.length > 0 ? last(segments).parameters : {};
@@ -86291,7 +86108,7 @@ class Recognizer {
       }
 
       consumedSegments = result.consumedSegments;
-      rawSlicedSegments = segments.slice(result.lastChild);
+      remainingSegments = result.remainingSegments;
       snapshot = new ActivatedRouteSnapshot(consumedSegments, result.parameters, Object.freeze(Object.assign({}, this.urlTree.queryParams)), this.urlTree.fragment, getData(route), getOutlet(route), route.component, route, getSourceSegmentGroup(rawSegment), getPathIndexShift(rawSegment) + consumedSegments.length, getResolve(route));
     }
 
@@ -86299,7 +86116,7 @@ class Recognizer {
     const {
       segmentGroup,
       slicedSegments
-    } = split(rawSegment, consumedSegments, rawSlicedSegments, // Filter out routes with redirectTo because we are trying to create activated route
+    } = split(rawSegment, consumedSegments, remainingSegments, // Filter out routes with redirectTo because we are trying to create activated route
     // snapshots and don't handle redirects here. That should have been done in
     // `applyRedirects`.
     childConfig.filter(c => c.redirectTo === undefined), this.relativeLinkResolution);
@@ -86483,7 +86300,7 @@ function resolveData(paramsInheritanceStrategy, moduleInjector) {
     }
 
     let canActivateChecksResolved = 0;
-    return (0,rxjs__WEBPACK_IMPORTED_MODULE_1__.from)(canActivateChecks).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_13__.concatMap)(check => runResolve(check.route, targetSnapshot, paramsInheritanceStrategy, moduleInjector)), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_18__.tap)(() => canActivateChecksResolved++), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_21__.takeLast)(1), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_17__.mergeMap)(_ => canActivateChecksResolved === canActivateChecks.length ? (0,rxjs__WEBPACK_IMPORTED_MODULE_2__.of)(t) : rxjs__WEBPACK_IMPORTED_MODULE_22__.EMPTY));
+    return (0,rxjs__WEBPACK_IMPORTED_MODULE_1__.from)(canActivateChecks).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_13__.concatMap)(check => runResolve(check.route, targetSnapshot, paramsInheritanceStrategy, moduleInjector)), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_18__.tap)(() => canActivateChecksResolved++), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_22__.takeLast)(1), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_17__.mergeMap)(_ => canActivateChecksResolved === canActivateChecks.length ? (0,rxjs__WEBPACK_IMPORTED_MODULE_2__.of)(t) : rxjs__WEBPACK_IMPORTED_MODULE_23__.EMPTY));
   });
 }
 
@@ -86506,14 +86323,14 @@ function resolveNode(resolve, futureARS, futureRSS, moduleInjector) {
   const data = {};
   return (0,rxjs__WEBPACK_IMPORTED_MODULE_1__.from)(keys).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_17__.mergeMap)(key => getResolver(resolve[key], futureARS, futureRSS, moduleInjector).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_18__.tap)(value => {
     data[key] = value;
-  }))), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_21__.takeLast)(1), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_17__.mergeMap)(() => {
+  }))), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_22__.takeLast)(1), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_17__.mergeMap)(() => {
     // Ensure all resolvers returned values, otherwise don't emit any "next" and just complete
     // the chain which will cancel navigation
     if (getDataKeys(data).length === keys.length) {
       return (0,rxjs__WEBPACK_IMPORTED_MODULE_2__.of)(data);
     }
 
-    return rxjs__WEBPACK_IMPORTED_MODULE_22__.EMPTY;
+    return rxjs__WEBPACK_IMPORTED_MODULE_23__.EMPTY;
   }));
 }
 
@@ -86685,7 +86502,7 @@ class RouterConfigLoader {
       throw err;
     })); // Use custom ConnectableObservable as share in runners pipe increasing the bundle size too much
 
-    route._loader$ = new rxjs__WEBPACK_IMPORTED_MODULE_23__.ConnectableObservable(loadRunner, () => new rxjs__WEBPACK_IMPORTED_MODULE_24__.Subject()).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_25__.refCount)());
+    route._loader$ = new rxjs__WEBPACK_IMPORTED_MODULE_24__.ConnectableObservable(loadRunner, () => new rxjs__WEBPACK_IMPORTED_MODULE_25__.Subject()).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_26__.refCount)());
     return route._loader$;
   }
 
@@ -86819,7 +86636,7 @@ class Router {
      * An event stream for routing events in this NgModule.
      */
 
-    this.events = new rxjs__WEBPACK_IMPORTED_MODULE_24__.Subject();
+    this.events = new rxjs__WEBPACK_IMPORTED_MODULE_25__.Subject();
     /**
      * A handler for navigation errors in this NgModule.
      */
@@ -87026,7 +86843,7 @@ class Router {
             eventsSubject.next(new NavigationStart(t.id, this.serializeUrl(t.extractedUrl), t.source, t.restoredState));
 
             if (transition !== this.transitions.getValue()) {
-              return rxjs__WEBPACK_IMPORTED_MODULE_22__.EMPTY;
+              return rxjs__WEBPACK_IMPORTED_MODULE_23__.EMPTY;
             } // This delay is required to match old behavior that forced
             // navigation to always be async
 
@@ -87088,7 +86905,7 @@ class Router {
              */
             this.rawUrlTree = t.rawUrl;
             t.resolve(null);
-            return rxjs__WEBPACK_IMPORTED_MODULE_22__.EMPTY;
+            return rxjs__WEBPACK_IMPORTED_MODULE_23__.EMPTY;
           }
         }
       }), // Before Preactivation
@@ -87208,7 +87025,7 @@ class Router {
           completed = true;
         }
 
-      }), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_26__.finalize)(() => {
+      }), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_27__.finalize)(() => {
         var _a;
         /* When the navigation stream finishes either through error or success, we
          * set the `completed` or `errored` flag. However, there are some situations
@@ -87301,7 +87118,7 @@ class Router {
           }
         }
 
-        return rxjs__WEBPACK_IMPORTED_MODULE_22__.EMPTY;
+        return rxjs__WEBPACK_IMPORTED_MODULE_23__.EMPTY;
       })); // TODO(jasonaden): remove cast once g3 is on updated TypeScript
     }));
   }
@@ -87666,25 +87483,10 @@ class Router {
   }
 
   scheduleNavigation(rawUrl, source, restoredState, extras, priorPromise) {
-    var _a, _b, _c;
+    var _a, _b;
 
     if (this.disposed) {
       return Promise.resolve(false);
-    } // Duplicate navigations may be triggered by attempts to sync AngularJS and
-    // Angular router states. We have the setTimeout in the location listener to
-    // ensure the imperative nav is scheduled before the browser nav.
-
-
-    const lastNavigation = this.transitions.value;
-    const browserNavPrecededByRouterNav = isBrowserTriggeredNavigation(source) && lastNavigation && !isBrowserTriggeredNavigation(lastNavigation.source);
-    const navToSameUrl = lastNavigation.rawUrl.toString() === rawUrl.toString();
-    const lastNavigationInProgress = lastNavigation.id === ((_a = this.currentNavigation) === null || _a === void 0 ? void 0 : _a.id); // We consider duplicates as ones that goes to the same URL while the first
-    // is still processing.
-
-    const isDuplicateNav = navToSameUrl && lastNavigationInProgress;
-
-    if (browserNavPrecededByRouterNav && isDuplicateNav) {
-      return Promise.resolve(true); // return value is not used
     }
 
     let resolve;
@@ -87721,9 +87523,9 @@ class Router {
         // If we're replacing the URL or doing a silent navigation, we do not want to increment the
         // page id because we aren't pushing a new entry to history.
         if (extras.replaceUrl || extras.skipLocationChange) {
-          targetPageId = (_b = this.browserPageId) !== null && _b !== void 0 ? _b : 0;
+          targetPageId = (_a = this.browserPageId) !== null && _a !== void 0 ? _a : 0;
         } else {
-          targetPageId = ((_c = this.browserPageId) !== null && _c !== void 0 ? _c : 0) + 1;
+          targetPageId = ((_b = this.browserPageId) !== null && _b !== void 0 ? _b : 0) + 1;
         }
       }
     } else {
@@ -87864,7 +87666,7 @@ Router.ɵprov = /* @__PURE__ */_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵd
     }, {
       type: ChildrenOutletContexts
     }, {
-      type: _angular_common__WEBPACK_IMPORTED_MODULE_27__.Location
+      type: _angular_common__WEBPACK_IMPORTED_MODULE_28__.Location
     }, {
       type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Injector
     }, {
@@ -87997,7 +87799,7 @@ class RouterLink {
     this.commands = null;
     /** @internal */
 
-    this.onChanges = new rxjs__WEBPACK_IMPORTED_MODULE_24__.Subject();
+    this.onChanges = new rxjs__WEBPACK_IMPORTED_MODULE_25__.Subject();
     this.setTabIndexIfNotOnNativeEl('0');
   }
   /**
@@ -88192,7 +87994,7 @@ class RouterLinkWithHref {
     this.href = null;
     /** @internal */
 
-    this.onChanges = new rxjs__WEBPACK_IMPORTED_MODULE_24__.Subject();
+    this.onChanges = new rxjs__WEBPACK_IMPORTED_MODULE_25__.Subject();
     this.subscription = router.events.subscribe(s => {
       if (s instanceof NavigationEnd) {
         this.updateTargetUrlAndHref();
@@ -88272,7 +88074,7 @@ class RouterLinkWithHref {
 }
 
 RouterLinkWithHref.ɵfac = function RouterLinkWithHref_Factory(t) {
-  return new (t || RouterLinkWithHref)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](Router), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](ActivatedRoute), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_common__WEBPACK_IMPORTED_MODULE_27__.LocationStrategy));
+  return new (t || RouterLinkWithHref)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](Router), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](ActivatedRoute), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_common__WEBPACK_IMPORTED_MODULE_28__.LocationStrategy));
 };
 
 RouterLinkWithHref.ɵdir = /* @__PURE__ */_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineDirective"]({
@@ -88317,7 +88119,7 @@ RouterLinkWithHref.ɵdir = /* @__PURE__ */_angular_core__WEBPACK_IMPORTED_MODULE
     }, {
       type: ActivatedRoute
     }, {
-      type: _angular_common__WEBPACK_IMPORTED_MODULE_27__.LocationStrategy
+      type: _angular_common__WEBPACK_IMPORTED_MODULE_28__.LocationStrategy
     }];
   }, {
     target: [{
@@ -88486,7 +88288,7 @@ class RouterLinkActive {
 
   ngAfterContentInit() {
     // `of(null)` is used to force subscribe body to execute once immediately (like `startWith`).
-    (0,rxjs__WEBPACK_IMPORTED_MODULE_2__.of)(this.links.changes, this.linksWithHrefs.changes, (0,rxjs__WEBPACK_IMPORTED_MODULE_2__.of)(null)).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_28__.mergeAll)()).subscribe(_ => {
+    (0,rxjs__WEBPACK_IMPORTED_MODULE_2__.of)(this.links.changes, this.linksWithHrefs.changes, (0,rxjs__WEBPACK_IMPORTED_MODULE_2__.of)(null)).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_29__.mergeAll)()).subscribe(_ => {
       this.update();
       this.subscribeToEachLinkOnChanges();
     });
@@ -88497,7 +88299,7 @@ class RouterLinkActive {
 
     (_a = this.linkInputChangesSubscription) === null || _a === void 0 ? void 0 : _a.unsubscribe();
     const allLinkChanges = [...this.links.toArray(), ...this.linksWithHrefs.toArray(), this.link, this.linkWithHref].filter(link => !!link).map(link => link.onChanges);
-    this.linkInputChangesSubscription = (0,rxjs__WEBPACK_IMPORTED_MODULE_1__.from)(allLinkChanges).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_28__.mergeAll)()).subscribe(link => {
+    this.linkInputChangesSubscription = (0,rxjs__WEBPACK_IMPORTED_MODULE_1__.from)(allLinkChanges).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_29__.mergeAll)()).subscribe(link => {
       if (this.isActive !== this.isLinkActive(this.router)(link)) {
         this.update();
       }
@@ -88761,7 +88563,7 @@ class RouterPreloader {
       }
     }
 
-    return (0,rxjs__WEBPACK_IMPORTED_MODULE_1__.from)(res).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_28__.mergeAll)(), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_4__.map)(_ => void 0));
+    return (0,rxjs__WEBPACK_IMPORTED_MODULE_1__.from)(res).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_29__.mergeAll)(), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_4__.map)(_ => void 0));
   }
 
   preloadConfig(ngModule, route) {
@@ -88898,7 +88700,7 @@ RouterScroller.ɵprov = /* @__PURE__ */_angular_core__WEBPACK_IMPORTED_MODULE_0_
     return [{
       type: Router
     }, {
-      type: _angular_common__WEBPACK_IMPORTED_MODULE_27__.ViewportScroller
+      type: _angular_common__WEBPACK_IMPORTED_MODULE_28__.ViewportScroller
     }, {
       type: undefined
     }];
@@ -88930,13 +88732,13 @@ const ROUTER_CONFIGURATION = new _angular_core__WEBPACK_IMPORTED_MODULE_0__.Inje
  */
 
 const ROUTER_FORROOT_GUARD = new _angular_core__WEBPACK_IMPORTED_MODULE_0__.InjectionToken('ROUTER_FORROOT_GUARD');
-const ROUTER_PROVIDERS = [_angular_common__WEBPACK_IMPORTED_MODULE_27__.Location, {
+const ROUTER_PROVIDERS = [_angular_common__WEBPACK_IMPORTED_MODULE_28__.Location, {
   provide: UrlSerializer,
   useClass: DefaultUrlSerializer
 }, {
   provide: Router,
   useFactory: setupRouter,
-  deps: [UrlSerializer, ChildrenOutletContexts, _angular_common__WEBPACK_IMPORTED_MODULE_27__.Location, _angular_core__WEBPACK_IMPORTED_MODULE_0__.Injector, _angular_core__WEBPACK_IMPORTED_MODULE_0__.Compiler, ROUTES, ROUTER_CONFIGURATION, [UrlHandlingStrategy, new _angular_core__WEBPACK_IMPORTED_MODULE_0__.Optional()], [RouteReuseStrategy, new _angular_core__WEBPACK_IMPORTED_MODULE_0__.Optional()]]
+  deps: [UrlSerializer, ChildrenOutletContexts, _angular_common__WEBPACK_IMPORTED_MODULE_28__.Location, _angular_core__WEBPACK_IMPORTED_MODULE_0__.Injector, _angular_core__WEBPACK_IMPORTED_MODULE_0__.Compiler, ROUTES, ROUTER_CONFIGURATION, [UrlHandlingStrategy, new _angular_core__WEBPACK_IMPORTED_MODULE_0__.Optional()], [RouteReuseStrategy, new _angular_core__WEBPACK_IMPORTED_MODULE_0__.Optional()]]
 }, ChildrenOutletContexts, {
   provide: ActivatedRoute,
   useFactory: rootRoute,
@@ -89008,13 +88810,13 @@ class RouterModule {
         provide: ROUTER_CONFIGURATION,
         useValue: config ? config : {}
       }, {
-        provide: _angular_common__WEBPACK_IMPORTED_MODULE_27__.LocationStrategy,
+        provide: _angular_common__WEBPACK_IMPORTED_MODULE_28__.LocationStrategy,
         useFactory: provideLocationStrategy,
-        deps: [_angular_common__WEBPACK_IMPORTED_MODULE_27__.PlatformLocation, [new _angular_core__WEBPACK_IMPORTED_MODULE_0__.Inject(_angular_common__WEBPACK_IMPORTED_MODULE_27__.APP_BASE_HREF), new _angular_core__WEBPACK_IMPORTED_MODULE_0__.Optional()], ROUTER_CONFIGURATION]
+        deps: [_angular_common__WEBPACK_IMPORTED_MODULE_28__.PlatformLocation, [new _angular_core__WEBPACK_IMPORTED_MODULE_0__.Inject(_angular_common__WEBPACK_IMPORTED_MODULE_28__.APP_BASE_HREF), new _angular_core__WEBPACK_IMPORTED_MODULE_0__.Optional()], ROUTER_CONFIGURATION]
       }, {
         provide: RouterScroller,
         useFactory: createRouterScroller,
-        deps: [Router, _angular_common__WEBPACK_IMPORTED_MODULE_27__.ViewportScroller, ROUTER_CONFIGURATION]
+        deps: [Router, _angular_common__WEBPACK_IMPORTED_MODULE_28__.ViewportScroller, ROUTER_CONFIGURATION]
       }, {
         provide: PreloadingStrategy,
         useExisting: config && config.preloadingStrategy ? config.preloadingStrategy : NoPreloading
@@ -89095,7 +88897,7 @@ function createRouterScroller(router, viewportScroller, config) {
 }
 
 function provideLocationStrategy(platformLocationStrategy, baseHref, options = {}) {
-  return options.useHash ? new _angular_common__WEBPACK_IMPORTED_MODULE_27__.HashLocationStrategy(platformLocationStrategy, baseHref) : new _angular_common__WEBPACK_IMPORTED_MODULE_27__.PathLocationStrategy(platformLocationStrategy, baseHref);
+  return options.useHash ? new _angular_common__WEBPACK_IMPORTED_MODULE_28__.HashLocationStrategy(platformLocationStrategy, baseHref) : new _angular_common__WEBPACK_IMPORTED_MODULE_28__.PathLocationStrategy(platformLocationStrategy, baseHref);
 }
 
 function provideForRootGuard(router) {
@@ -89214,11 +89016,11 @@ class RouterInitializer {
     this.injector = injector;
     this.initNavigation = false;
     this.destroyed = false;
-    this.resultOfPreactivationDone = new rxjs__WEBPACK_IMPORTED_MODULE_24__.Subject();
+    this.resultOfPreactivationDone = new rxjs__WEBPACK_IMPORTED_MODULE_25__.Subject();
   }
 
   appInitializer() {
-    const p = this.injector.get(_angular_common__WEBPACK_IMPORTED_MODULE_27__.LOCATION_INITIALIZED, Promise.resolve(null));
+    const p = this.injector.get(_angular_common__WEBPACK_IMPORTED_MODULE_28__.LOCATION_INITIALIZED, Promise.resolve(null));
     return p.then(() => {
       // If the injector was destroyed, the DI lookups below will fail.
       if (this.destroyed) {
@@ -89349,7 +89151,7 @@ function provideRouterInitializer() {
  */
 
 
-const VERSION = new _angular_core__WEBPACK_IMPORTED_MODULE_0__.Version('13.2.3');
+const VERSION = new _angular_core__WEBPACK_IMPORTED_MODULE_0__.Version('13.2.7');
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
@@ -89423,7 +89225,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! rxjs/operators */ 8759);
 /* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! rxjs/operators */ 5843);
 /**
- * @license Angular v13.2.3
+ * @license Angular v13.2.7
  * (c) 2010-2022 Google LLC. https://angular.io/
  * License: MIT
  */
@@ -90011,6 +89813,422 @@ ServiceWorkerModule.ɵinj = /* @__PURE__ */_angular_core__WEBPACK_IMPORTED_MODUL
  */
 
 
+
+
+/***/ }),
+
+/***/ 2321:
+/*!******************************************!*\
+  !*** ./node_modules/tslib/tslib.es6.mjs ***!
+  \******************************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "__addDisposableResource": () => (/* binding */ __addDisposableResource),
+/* harmony export */   "__assign": () => (/* binding */ __assign),
+/* harmony export */   "__asyncDelegator": () => (/* binding */ __asyncDelegator),
+/* harmony export */   "__asyncGenerator": () => (/* binding */ __asyncGenerator),
+/* harmony export */   "__asyncValues": () => (/* binding */ __asyncValues),
+/* harmony export */   "__await": () => (/* binding */ __await),
+/* harmony export */   "__awaiter": () => (/* binding */ __awaiter),
+/* harmony export */   "__classPrivateFieldGet": () => (/* binding */ __classPrivateFieldGet),
+/* harmony export */   "__classPrivateFieldIn": () => (/* binding */ __classPrivateFieldIn),
+/* harmony export */   "__classPrivateFieldSet": () => (/* binding */ __classPrivateFieldSet),
+/* harmony export */   "__createBinding": () => (/* binding */ __createBinding),
+/* harmony export */   "__decorate": () => (/* binding */ __decorate),
+/* harmony export */   "__disposeResources": () => (/* binding */ __disposeResources),
+/* harmony export */   "__esDecorate": () => (/* binding */ __esDecorate),
+/* harmony export */   "__exportStar": () => (/* binding */ __exportStar),
+/* harmony export */   "__extends": () => (/* binding */ __extends),
+/* harmony export */   "__generator": () => (/* binding */ __generator),
+/* harmony export */   "__importDefault": () => (/* binding */ __importDefault),
+/* harmony export */   "__importStar": () => (/* binding */ __importStar),
+/* harmony export */   "__makeTemplateObject": () => (/* binding */ __makeTemplateObject),
+/* harmony export */   "__metadata": () => (/* binding */ __metadata),
+/* harmony export */   "__param": () => (/* binding */ __param),
+/* harmony export */   "__propKey": () => (/* binding */ __propKey),
+/* harmony export */   "__read": () => (/* binding */ __read),
+/* harmony export */   "__rest": () => (/* binding */ __rest),
+/* harmony export */   "__runInitializers": () => (/* binding */ __runInitializers),
+/* harmony export */   "__setFunctionName": () => (/* binding */ __setFunctionName),
+/* harmony export */   "__spread": () => (/* binding */ __spread),
+/* harmony export */   "__spreadArray": () => (/* binding */ __spreadArray),
+/* harmony export */   "__spreadArrays": () => (/* binding */ __spreadArrays),
+/* harmony export */   "__values": () => (/* binding */ __values),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/******************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+/* global Reflect, Promise, SuppressedError, Symbol */
+
+var extendStatics = function(d, b) {
+  extendStatics = Object.setPrototypeOf ||
+      ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+      function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+  return extendStatics(d, b);
+};
+
+function __extends(d, b) {
+  if (typeof b !== "function" && b !== null)
+      throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+  extendStatics(d, b);
+  function __() { this.constructor = d; }
+  d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+}
+
+var __assign = function() {
+  __assign = Object.assign || function __assign(t) {
+      for (var s, i = 1, n = arguments.length; i < n; i++) {
+          s = arguments[i];
+          for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+      }
+      return t;
+  }
+  return __assign.apply(this, arguments);
+}
+
+function __rest(s, e) {
+  var t = {};
+  for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+      t[p] = s[p];
+  if (s != null && typeof Object.getOwnPropertySymbols === "function")
+      for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+          if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+              t[p[i]] = s[p[i]];
+      }
+  return t;
+}
+
+function __decorate(decorators, target, key, desc) {
+  var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+  if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+  else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+  return c > 3 && r && Object.defineProperty(target, key, r), r;
+}
+
+function __param(paramIndex, decorator) {
+  return function (target, key) { decorator(target, key, paramIndex); }
+}
+
+function __esDecorate(ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {
+  function accept(f) { if (f !== void 0 && typeof f !== "function") throw new TypeError("Function expected"); return f; }
+  var kind = contextIn.kind, key = kind === "getter" ? "get" : kind === "setter" ? "set" : "value";
+  var target = !descriptorIn && ctor ? contextIn["static"] ? ctor : ctor.prototype : null;
+  var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});
+  var _, done = false;
+  for (var i = decorators.length - 1; i >= 0; i--) {
+      var context = {};
+      for (var p in contextIn) context[p] = p === "access" ? {} : contextIn[p];
+      for (var p in contextIn.access) context.access[p] = contextIn.access[p];
+      context.addInitializer = function (f) { if (done) throw new TypeError("Cannot add initializers after decoration has completed"); extraInitializers.push(accept(f || null)); };
+      var result = (0, decorators[i])(kind === "accessor" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);
+      if (kind === "accessor") {
+          if (result === void 0) continue;
+          if (result === null || typeof result !== "object") throw new TypeError("Object expected");
+          if (_ = accept(result.get)) descriptor.get = _;
+          if (_ = accept(result.set)) descriptor.set = _;
+          if (_ = accept(result.init)) initializers.unshift(_);
+      }
+      else if (_ = accept(result)) {
+          if (kind === "field") initializers.unshift(_);
+          else descriptor[key] = _;
+      }
+  }
+  if (target) Object.defineProperty(target, contextIn.name, descriptor);
+  done = true;
+};
+
+function __runInitializers(thisArg, initializers, value) {
+  var useValue = arguments.length > 2;
+  for (var i = 0; i < initializers.length; i++) {
+      value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);
+  }
+  return useValue ? value : void 0;
+};
+
+function __propKey(x) {
+  return typeof x === "symbol" ? x : "".concat(x);
+};
+
+function __setFunctionName(f, name, prefix) {
+  if (typeof name === "symbol") name = name.description ? "[".concat(name.description, "]") : "";
+  return Object.defineProperty(f, "name", { configurable: true, value: prefix ? "".concat(prefix, " ", name) : name });
+};
+
+function __metadata(metadataKey, metadataValue) {
+  if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(metadataKey, metadataValue);
+}
+
+function __awaiter(thisArg, _arguments, P, generator) {
+  function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+  return new (P || (P = Promise))(function (resolve, reject) {
+      function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+      function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+      function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+      step((generator = generator.apply(thisArg, _arguments || [])).next());
+  });
+}
+
+function __generator(thisArg, body) {
+  var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+  return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+  function verb(n) { return function (v) { return step([n, v]); }; }
+  function step(op) {
+      if (f) throw new TypeError("Generator is already executing.");
+      while (g && (g = 0, op[0] && (_ = 0)), _) try {
+          if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+          if (y = 0, t) op = [op[0] & 2, t.value];
+          switch (op[0]) {
+              case 0: case 1: t = op; break;
+              case 4: _.label++; return { value: op[1], done: false };
+              case 5: _.label++; y = op[1]; op = [0]; continue;
+              case 7: op = _.ops.pop(); _.trys.pop(); continue;
+              default:
+                  if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                  if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                  if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                  if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                  if (t[2]) _.ops.pop();
+                  _.trys.pop(); continue;
+          }
+          op = body.call(thisArg, _);
+      } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+      if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+  }
+}
+
+var __createBinding = Object.create ? (function(o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  var desc = Object.getOwnPropertyDescriptor(m, k);
+  if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+  }
+  Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  o[k2] = m[k];
+});
+
+function __exportStar(m, o) {
+  for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(o, p)) __createBinding(o, m, p);
+}
+
+function __values(o) {
+  var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+  if (m) return m.call(o);
+  if (o && typeof o.length === "number") return {
+      next: function () {
+          if (o && i >= o.length) o = void 0;
+          return { value: o && o[i++], done: !o };
+      }
+  };
+  throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+}
+
+function __read(o, n) {
+  var m = typeof Symbol === "function" && o[Symbol.iterator];
+  if (!m) return o;
+  var i = m.call(o), r, ar = [], e;
+  try {
+      while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+  }
+  catch (error) { e = { error: error }; }
+  finally {
+      try {
+          if (r && !r.done && (m = i["return"])) m.call(i);
+      }
+      finally { if (e) throw e.error; }
+  }
+  return ar;
+}
+
+/** @deprecated */
+function __spread() {
+  for (var ar = [], i = 0; i < arguments.length; i++)
+      ar = ar.concat(__read(arguments[i]));
+  return ar;
+}
+
+/** @deprecated */
+function __spreadArrays() {
+  for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+  for (var r = Array(s), k = 0, i = 0; i < il; i++)
+      for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+          r[k] = a[j];
+  return r;
+}
+
+function __spreadArray(to, from, pack) {
+  if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+      if (ar || !(i in from)) {
+          if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+          ar[i] = from[i];
+      }
+  }
+  return to.concat(ar || Array.prototype.slice.call(from));
+}
+
+function __await(v) {
+  return this instanceof __await ? (this.v = v, this) : new __await(v);
+}
+
+function __asyncGenerator(thisArg, _arguments, generator) {
+  if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+  var g = generator.apply(thisArg, _arguments || []), i, q = [];
+  return i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i;
+  function verb(n) { if (g[n]) i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; }
+  function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }
+  function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }
+  function fulfill(value) { resume("next", value); }
+  function reject(value) { resume("throw", value); }
+  function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }
+}
+
+function __asyncDelegator(o) {
+  var i, p;
+  return i = {}, verb("next"), verb("throw", function (e) { throw e; }), verb("return"), i[Symbol.iterator] = function () { return this; }, i;
+  function verb(n, f) { i[n] = o[n] ? function (v) { return (p = !p) ? { value: __await(o[n](v)), done: false } : f ? f(v) : v; } : f; }
+}
+
+function __asyncValues(o) {
+  if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+  var m = o[Symbol.asyncIterator], i;
+  return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
+  function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
+  function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
+}
+
+function __makeTemplateObject(cooked, raw) {
+  if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
+  return cooked;
+};
+
+var __setModuleDefault = Object.create ? (function(o, v) {
+  Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+  o["default"] = v;
+};
+
+function __importStar(mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+  __setModuleDefault(result, mod);
+  return result;
+}
+
+function __importDefault(mod) {
+  return (mod && mod.__esModule) ? mod : { default: mod };
+}
+
+function __classPrivateFieldGet(receiver, state, kind, f) {
+  if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+  if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+  return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+}
+
+function __classPrivateFieldSet(receiver, state, value, kind, f) {
+  if (kind === "m") throw new TypeError("Private method is not writable");
+  if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
+  if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
+  return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
+}
+
+function __classPrivateFieldIn(state, receiver) {
+  if (receiver === null || (typeof receiver !== "object" && typeof receiver !== "function")) throw new TypeError("Cannot use 'in' operator on non-object");
+  return typeof state === "function" ? receiver === state : state.has(receiver);
+}
+
+function __addDisposableResource(env, value, async) {
+  if (value !== null && value !== void 0) {
+    if (typeof value !== "object" && typeof value !== "function") throw new TypeError("Object expected.");
+    var dispose;
+    if (async) {
+        if (!Symbol.asyncDispose) throw new TypeError("Symbol.asyncDispose is not defined.");
+        dispose = value[Symbol.asyncDispose];
+    }
+    if (dispose === void 0) {
+        if (!Symbol.dispose) throw new TypeError("Symbol.dispose is not defined.");
+        dispose = value[Symbol.dispose];
+    }
+    if (typeof dispose !== "function") throw new TypeError("Object not disposable.");
+    env.stack.push({ value: value, dispose: dispose, async: async });
+  }
+  else if (async) {
+    env.stack.push({ async: true });
+  }
+  return value;
+}
+
+var _SuppressedError = typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
+  var e = new Error(message);
+  return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+};
+
+function __disposeResources(env) {
+  function fail(e) {
+    env.error = env.hasError ? new _SuppressedError(e, env.error, "An error was suppressed during disposal.") : e;
+    env.hasError = true;
+  }
+  function next() {
+    while (env.stack.length) {
+      var rec = env.stack.pop();
+      try {
+        var result = rec.dispose && rec.dispose.call(rec.value);
+        if (rec.async) return Promise.resolve(result).then(next, function(e) { fail(e); return next(); });
+      }
+      catch (e) {
+          fail(e);
+      }
+    }
+    if (env.hasError) throw env.error;
+  }
+  return next();
+}
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  __extends,
+  __assign,
+  __rest,
+  __decorate,
+  __param,
+  __metadata,
+  __awaiter,
+  __generator,
+  __createBinding,
+  __exportStar,
+  __values,
+  __read,
+  __spread,
+  __spreadArrays,
+  __spreadArray,
+  __await,
+  __asyncGenerator,
+  __asyncDelegator,
+  __asyncValues,
+  __makeTemplateObject,
+  __importStar,
+  __importDefault,
+  __classPrivateFieldGet,
+  __classPrivateFieldSet,
+  __classPrivateFieldIn,
+  __addDisposableResource,
+  __disposeResources,
+});
 
 
 /***/ })
