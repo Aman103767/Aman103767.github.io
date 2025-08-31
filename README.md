@@ -1,33 +1,24 @@
-# Personal website for introduce yourself
+# Portfolio Website 🌐  
 
-## Getting Started
+A personal portfolio website built with **Angular** to showcase my projects, skills, and experience.  
 
-I have developed this theme as a personal proyect. I have taked the inspiration (and basically all the design) from the wonderful work of Britanny Chiang. You can visit her repo [here](https://github.com/bchiang7/v4)
+## 🚀 Features  
+- Responsive and modern design  
+- Projects showcase with links  
+- About Me section  
+- Skills and technologies  
+- Contact form with validation  
+- Hosted on **GitHub Pages**  
 
-Because I'm not a ReactJS expert (language of the Britanny's proyect), and I liked so much the design, I decided to develop this proyect with Angular's architecture. The website is not connected to any api yet, nither it has dinamic content so that all the content is static inside the HTML files in Angular. I want to connect it to an API in the future, from where i can manage in an easy way without having touch the HTML files in angular.
+## 🛠️ Tech Stack  
+- **Framework:** Angular  
+- **Language:** TypeScript  
+- **Styling:** SCSS / CSS / HTML5  
+- **Hosting:** GitHub Pages  
 
-If you have any idea or you just want to contribute in this repo in order to improve the development architecture, I invite you to do it! If you have some suggestion to me, i will be glade to recibe it
+## 📦 Installation & Setup  
 
-### Prerequisites
-
-You need to have npm and Angular CLI installed in your pc. Npm is aviable with NodeJS in [here](https://nodejs.org/es/). After you install npm, install Angular CLI by typping the following command in your terminal
-
-``` bash
-npm install -g @angular/cli
-```
-
-### Installing
-
-Just clone  the repo and excecute the following command inside the folder proyect
-
-``` bash
-npm install
-```
-
-### All done!!
-
-Now just run
-```
-npm start
-```
-Wait to compile and go to [http://localhost:4200](http://localhost:4200) after compile finish
+Clone the repo:  
+```bash
+git clone https://github.com/your-username/portfolio-angular.git
+cd portfolio-angular
