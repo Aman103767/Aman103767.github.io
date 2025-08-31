@@ -8,15 +8,15 @@
                 </div>
                 <div class='banner-title'>
                     <h2>Aman Sharma</h2>
-                    <h3>Full-Stack Developer</h3>
+                    <h3>Software Developer</h3>
                 </div>
                 <div class='banner-description'>
                     <p [innerHTML]='"Banner.Description" | translate' class="mt-4"></p>
                 </div>
             </div>
             <div class="div-btn-banner">
-                <a (click)='analyticsService.sendAnalyticEvent("click_send_mail", "banner", "email")' href="mailto:aman198sharma114@gmail.com" target="_black" class="main-btn">
-                    {{"Banner.ActionBtn" | translate}}
+                <a (click)="downloadCV()" class="main-btn cv-btn h5" style="font-size: 14px;">
+                    {{"Header.cvBtn" | translate}}
                 </a>
             </div>
         </div>

@@ -1,51 +1,73 @@
 {
-
-    "Header.Item1" : "About me",
-    "Header.Item2" : "Experience",
-    "Header.Item3" : "Projects",
-    "Header.Item4" : "Contact",
-    "Header.cvBtn" : "Resume",
+    "Header.Item1": "About me",
+    "Header.Item2": "Experience",
+    "Header.Item3": "Projects",
+    "Header.Item4": "Contact",
+    "Header.cvBtn": "Resume",
     "Header.cvName": "Aman_Sharma_Resume.pdf",
-
     "Banner.Pretitle": "Hello! My name is",
-    "Banner.Description": "I have <span class='underline'>2 years of experience</span> developing systems, interfaces, bots, and technological solutions to make the web a better place. I am dedicated to writing and refactoring clean, reusable, and scalable code in <span class='underline'>Java</span> and <span class='underline'>Angular</span> applying good practices and development standards.",
+    "Banner.Description": "I have around <span class='underline'>3 years of experience</span> designing scalable architectures, optimizing databases, and delivering secure, high-performance systems using Java, Spring Boot, and Microservices.",
     "Banner.ActionBtn": "Get in touch",
-
     "AboutMe.Title": "About me",
     "AboutMe.Paragraphs": [
-        "In my <span class='underline'>2 years as a developer</span>, I seek to train every day. I have worked writing <span class='underline'>Angular</span>, <span class='underline'>performing continuous integration</span>, and covering backend developer roles with <span class='underline'>Java and Mysql</span>. I have led teams having empathy, exercising motivation to partners, and setting plans and goals together.",
-        "My skills also include implementing system improvements, optimizing sites, standardizing patterns, and suggesting and executing ideas that add value to the project I'm working on.",
-        "Some of the technologies that I have trained and worked on include (but are not limited to):"
+        "With around <span class='underline'>3 years of experience as a backend developer</span>, I am passionate about building scalable and reliable systems. My expertise lies in <span class='underline'>Java, Spring Boot, and MySQL</span>, and I have also worked with <span class='underline'>Microservices, Kafka, and RESTful APIs</span>. Alongside coding, I have collaborated with teams by sharing knowledge, motivating peers, and contributing to achieving project goals effectively.",
+        "I focus on designing <span class='underline'>secure architectures</span>, <span class='underline'>optimizing database performance</span>, and <span class='underline'>improving system efficiency</span>. My approach emphasizes writing clean, reusable, and maintainable code while following best practices and industry standards.",
+        "Some of the technologies and tools I have worked with include (but are not limited to):"
     ],
-
-
     "Experience.Title": "Experience",
-    "Experience.Jobs": [{
-            "Tab": "HostBooks",
-            "Title": "Software Developer",
-            "Date": "February 2023 - Present",
+    "Experience.Jobs": [
+        {
+            "Tab": "Salesken.ai",
+            "Title": "SDE-1",
+            "Date": "October 2024 – Present",
             "Description": [
-              "Developed and deployed resilient and secure backend architecture using Spring Boot and Hibernate technologies",
-              "Implemented strategic solutions to streamline data processing, enhancing the reliability of accounting applications",
-              "Crafted and orchestrated RESTful APIs for optimized inter-system communication",
-              "Fostered fluid data exchange between backend and frontend environments"
+                "Refactored and tuned <span class='underline'>SQL queries</span>, cutting execution time by <span class='underline'>80%</span> using advanced <span class='underline'>partitioning and indexing</span> strategies.",
+                "Developed <span class='underline'>Kafka-based messaging pipelines</span> to process ML outputs, automating <span class='underline'>QA scoring</span> and improving conversation analysis accuracy by <span class='underline'>25%</span>, handling over <span class='underline'>1 million conversations per day</span>.",
+                "Integrated <span class='underline'>AI-driven recommendation APIs</span> to prioritize follow-up deals and provide personalized <span class='underline'>next-best action suggestions</span> for the sales team.",
+                "Executed <span class='underline'>zero-downtime migrations</span>, safeguarding <span class='underline'>99.9% data integrity</span> during critical platform upgrades.",
+                "Enhanced <span class='underline'>analytics dashboards</span>, reducing query latency by <span class='underline'>40%</span> and accelerating business decision-making.",
+                "Led <span class='underline'>code reviews</span> and mentored <span class='underline'>junior engineers</span>, enforcing best practices in <span class='underline'>CI/CD, system design, and coding standards</span>."
+            ]
+        },
+        {
+            "Tab": "HostBooks",
+            "Title": "SDE",
+            "Date": "February 2023 - August 2024",
+            "Description": [
+                "Engineered and maintained <span class='underline'>RESTful APIs</span> for accounting apps, improving transaction efficiency by 25%.",
+                "Optimized <span class='underline'>SQL queries</span> for financial/compliance reports, reducing generation time by 30%.",
+                "Implemented <span class='underline'>RBAC</span> and multi-level approvals, strengthening enterprise security and compliance.",
+                "Developed reusable <span class='underline'>Angular components</span>, reducing feature delivery time by 20%.",
+                "Enhanced inventory management system with <span class='underline'>real-time tracking</span>, improving accuracy by 15%.",
+                "Built offline-first <span class='underline'>POS sync APIs</span>, ensuring seamless data sync with central systems."
             ]
         }
     ],
-
     "FeatureProjects.Title": "My projects",
     "FeatureProjects.Label": "Featured Project",
-    "FeatureProjects.Projects": [{
+    "FeatureProjects.Projects": [
+        {
             "Title": "BindGo",
             "Description": "E-commerce application made from scratch with auth module, configurable different Modules, <span class='underline'>product, </span> <span class='underline'>Cart, </span> <span class='underline'>Order</span> and <span class='underline'>Review</span>. It also has feedback form logic for all products.",
             "imgs": [
                 "assets/images/bindgo/bindgo1.png",
                 "assets/images/bindgo/bindgo2.png",
                 "assets/images/bindgo/schema.png"
-
             ],
             "ghLink": "https://github.com/Aman103767/E-Commerce-Application",
-            "Technologies": [ "Java","Spring Boot", "Hibernate","Mysql", "Maven", "Angular", "TypeScript", "Angular Material", "RxJS","PrimeNg", "AWS"]
+            "Technologies": [
+                "Java",
+                "Spring Boot",
+                "Hibernate",
+                "Mysql",
+                "Maven",
+                "Angular",
+                "TypeScript",
+                "Angular Material",
+                "RxJS",
+                "PrimeNg",
+                "AWS"
+            ]
         },
         {
             "Title": "Online Cab Booking Application",
@@ -55,7 +77,12 @@
                 "assets/images/bindgo/schema2.jpg"
             ],
             "ghLink": "https://github.com/Aman103767/Online-Cab-Booking-Application",
-            "Technologies": ["Java","Spring Boot", "Hibernate","Mysql"]
+            "Technologies": [
+                "Java",
+                "Spring Boot",
+                "Hibernate",
+                "Mysql"
+            ]
         },
         {
             "Title": "Bus-Ticket-Reservation-System",
@@ -64,7 +91,11 @@
                 "assets/images/bindgo/bus.png"
             ],
             "ghLink": "https://github.com/Aman103767/Bus-Ticket-Reservation-System",
-            "Technologies": ["Java", "Mysql", "JDBC"]
+            "Technologies": [
+                "Java",
+                "Mysql",
+                "JDBC"
+            ]
         },
         {
             "Title": "Asos",
@@ -79,7 +110,11 @@
             ],
             "ghLink": "https://github.com/Aman103767/Asos-Clone",
             "demoLink": "https://project-unit3-f72f.vercel.app/index.html",
-            "Technologies": ["HTML", "CSS", "JavaScipt"]
+            "Technologies": [
+                "HTML",
+                "CSS",
+                "JavaScipt"
+            ]
         },
         {
             "Title": "KindMeal",
@@ -93,7 +128,11 @@
             ],
             "ghLink": "https://github.com/Aman103767/KindMeal-Clone",
             "demoLink": "https://keen-pasca-121c61.netlify.app/",
-            "Technologies": ["HTML", "CSS", "JavaScipt"]
+            "Technologies": [
+                "HTML",
+                "CSS",
+                "JavaScipt"
+            ]
         },
         {
             "Title": "Weather Application",
@@ -105,30 +144,44 @@
             ],
             "ghLink": "https://github.com/Aman103767/Weather-Application",
             "demoLink": "https://dainty-selkie-a4e7d7.netlify.app",
-            "Technologies": ["HTML", "CSS", "JavaScipt"]
+            "Technologies": [
+                "HTML",
+                "CSS",
+                "JavaScipt"
+            ]
         }
     ],
-
-
-
     "OtherProjects.Title": "More projects",
-    "OtherProjects.Projects": [{
+    "OtherProjects.Projects": [
+        {
             "Title": "Spotify",
             "Description": "This is spotify Music Application Where you set upload songs, albums and artist and play Song. The main objective of this application to learn AWS with spring boot",
             "ghLink": "https://github.com/Aman103767/Spotify-Angular",
-            "Technologies": [ "Java","Spring Boot", "Hibernate","Mysql", "Maven", "Angular", "TypeScript", "Angular Material", "RxJS","PrimeNg", "AWS"]
+            "Technologies": [
+                "Java",
+                "Spring Boot",
+                "Hibernate",
+                "Mysql",
+                "Maven",
+                "Angular",
+                "TypeScript",
+                "Angular Material",
+                "RxJS",
+                "PrimeNg",
+                "AWS"
+            ]
         },
         {
             "Title": "Toll-Calculator",
             "Description": "Toll Calculator Toll Calculator for different Vehicles Features: Calculating Total Toll, Calculating Total Discount, Calculating Total Fastag Amount Collected, Calculating Total Cash Amount Collected",
             "ghLink": "https://github.com/Aman103767/Toll-Calculator",
-            "Technologies": ["Java"]
+            "Technologies": [
+                "Java"
+            ]
         }
     ],
     "Contact.Pretitle": "What’s Next",
     "Contact.Title": "Get in touch!",
     "Contact.Content": "I will be happy to receive your contact if you want to talk about new opportunities. Write me, and I will reply as soon as I see your message. Simple one-page design that features a profile letter with basic information about a person.",
     "Contact.Btn": "Say Hello"
-
-
 }

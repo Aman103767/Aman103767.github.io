@@ -2,6 +2,7 @@ import { Component, OnInit, AfterViewInit } from '@angular/core';
 
 import {trigger, state, style, animate, transition, stagger, query } from "@angular/animations"
 import { AnalyticsService } from 'src/app/services/analytics/analytics.service';
+import { LanguageService } from 'src/app/services/language/language.service';
 
 @Component({
   selector: 'app-banner',
@@ -25,14 +26,18 @@ import { AnalyticsService } from 'src/app/services/analytics/analytics.service';
 })
 export class BannerComponent implements OnInit {
 
-  
+    cvName: string = "";
 
   constructor(
-    public analyticsService: AnalyticsService
+    public analyticsService: AnalyticsService,
+    public languageService : LanguageService
   ) { }
 
   ngOnInit(): void { 
   }
   
+    downloadCV(){
+      window.open('https://drive.google.com/file/d/1QQa24nYTc5sJVAkyXfh_-rFZ7esyE5gq/view');
+  }
 
 }
