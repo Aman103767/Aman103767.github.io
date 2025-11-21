@@ -14,4 +14,6 @@ A personal portfolio website built with **Angular** to showcase my projects, ski
 - **Framework:** Angular  
 - **Language:** TypeScript  
 - **Styling:** SCSS / CSS / HTML5  
-- **Hosting:** GitHub Pages  
+- **Hosting:** GitHub Pages
+
+  
